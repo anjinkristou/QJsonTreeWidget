@@ -1,0 +1,4 @@
+QJsonTreeWidget uses QJSon library by Fabio Castelli (http://qjson.sourceforge.net), it must be checkouted in the libs folder.
+
+Then, just open the cfgtest.pro in QtCreator and compile.
+

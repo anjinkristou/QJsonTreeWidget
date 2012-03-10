@@ -1,0 +1,23 @@
+{ "_desc_" :  "Configuration options", "name" : "Configuration", "version" : 2, "_headers_": "name:name:0,description:_desc_:1,value:value:2,value2:anothervalue:3,click:_button1_:4:draw,click2:_button2_:5:draw", "_children_" : [
+    { "_desc_" : "Tree sample", "name" : "tree1", "_widget_:value" : "Tree", "_children_" : [
+    { "_desc_" : "String sample", "name" : "foostring", "_regexp_:value" : ".+", "value" : "abcdefghijklmnopqrstuwxyz", "_widget_:value" : "QLineEdit" },
+    { "_desc_" : "Spinbox sample", "_valuemax_:value" : 200, "_valuemin_:value" : 50, "name" : "foocount", "value" : 100, "_widget_:value" : "QSpinBox" },
+    { "_desc_" : "Checkbox sample", "name" : "foocheckbox", "value" : true, "_widget_:value" : "QCheckBox" },
+    { "_desc_" : "Hidden sample", "_hide_":true, "name" : "foocheckbox2", "value" : true, "_widget_:value" : "QCheckBox" },
+    { "_desc_" : "Sample with hidden value", "name" : "foocheckbox3", "value" : true, "_widget_:value" : "QCheckBox", "anothervalue" : true, "_widget_:anothervalue" : "QCheckBox", "_hide_:anothervalue":true },
+    { "_desc_" : "Test button clicks", "name" : "testbutton1", "_button1_": "QPushButton,clickme!", "_button2_": "QPushButton,clickme2!" }
+  ] },
+  { "_desc_" : "Another tree", "name" : "tree2", "_widget_:value" : "Tree", "_children_" : [
+    { "_desc_" : "A subtree", "name" : "tree3", "_widget_:value" : "Tree", "_children_" : [
+      { "_desc_" : "Another subtree", "name" : "tree4", "_widget_:value" : "Tree", "_children_" : [
+        { "_desc_" : "Combobox sample, readonly", "name" : "foocombo", "_readonly_:value" : true, "value" : "value1", "_valuelist_:value" : "value1,value2,value3", "_widget_:value" : "QComboBox" },
+        { "_desc_" : "Template sample", "name" : "footemplate", "_template_":true, "_mandatory_":true, "_widget_:value" : "Tree", "_children_" : [
+          { "_desc_" : "A string", "name" : "foostring", "_readonly_:value" : false, "_regexp_:value" : ".+", "value" : "1234567890", "_widget_:value": "QLineEdit" }
+        ] },
+        { "_desc_" : "Template sample", "name" : "footemplate", "_widget_:value" : "Tree", "_children_" : [
+          { "_desc_" : "A string", "name" : "foostring", "_readonly_:value" : false, "_regexp_:value" : ".+", "value" : "bla,bla,bla", "_widget_:value": "QLineEdit" }
+        ] }
+      ] }
+    ] }
+  ] }
+] }
