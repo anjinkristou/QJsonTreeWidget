@@ -1,21 +1,22 @@
-QJsonTreeWidget is a QT library which eases the displaying and editing of JSON structured trees :
-think of you application configuration data, or generally any other kind of data you need to display using a tree.
+QJsonTreeWidget is a QT library which eases the displaying and editing of JSON structured trees.
+think of your application configuration data, or generally any other kind of data you need to display using a tree.
 
-Internally it's optimized for performance of displaying large trees too, using its own model which fetches data on-demand only.
+Internally it's optimized for performance of displaying large trees too, using its own model which fetches 
+data on-demand only.
 
 Usage is really simple, you just have to adopt this format for your tree:
 
-. each line of the JSON file should represent a leaf in your tree (this eases maintenance by hand, but really you can indent
-  your JSON whatever you prefer), embodied in a JSON object.
+. each line of the JSON file should represent a leaf in your tree (this eases maintenance by hand, but really 
+  you can indent your JSON whatever you prefer), embodied in a JSON object.
 
 . each leaf must have a '_desc_' and a 'name' node. if it's a parent node, it must have a '_children_' JSON node.
 
-. the root JSON object must have a 'version' node (to support versioning) and a '_headers_' node'. format of the _headers_ node is
-  
-  <columndisplayname:JSONtag:columnidx[:draw],...>
+. the root JSON object must have a 'version' node (to support versioning) and a '_headers_' node'. 
+  format of the _headers_ node is <columndisplayname:JSONtag:columnidx[:draw],...>
 
-  this tells QJSonTreeWidget to display each node named <JSONtag> in a column with header named <columndisplayname> at index <columnidx>.
-  the optional <draw> parameter is for columns where you need a custom painted widget (not an editor), such a button.
+  this tells QJSonTreeWidget to display each node named <JSONtag> in a column with header named <columndisplayname> at 
+  index <columnidx>.
+  the optional <draw> parameter is for columns where you need a custom painted widget (not an editor), such as a button.
 
 . each leaf can have one or more widgets to be displayed, actually QJsonTreeWidget supports, as editors, 
   QLineEdit, QSpinBox, QCheckBox and QComboBox. As static widgets, QPushButton. 
@@ -24,22 +25,23 @@ Usage is really simple, you just have to adopt this format for your tree:
 
 . to display an editor widget, use something like :
   "value": yourvalue, "_widget_:value": "QLineEdit"
-  to display a static widget:
-  "button": "QPushButton,buttontext"
+  
+   to display a static widget:
+  "button1": "QPushButton,buttontext"
 
-. every leaf can have a '_hide_' parameter, which hides the whole leaf from displaying. Moreover, if you use '_hide_:JSONtag' you
-  can selectively hide only the node named <JSONtag>.
+. every leaf can have a '_hide_' parameter, which hides the whole leaf from displaying. 
+  moreover, if you use '_hide_:JSONtag' you can selectively hide only the node named <JSONtag>.
 
 . every leaf can have optional '_readonly_:JSONtag' to selectively display <JSONtag> node as readonly. 
 
-. a parent leaf can have an optional '_template_' bool node. if this is set, the leaf is used as a template leaf (hidden from
-  display), which means the user can right-click on the leaf to create/delete child leafs of the same type. 
+. a parent leaf can have an optional '_template_' bool node. if this is set, the leaf is used as a template leaf 
+  (hidden from display), which means the user can right-click on the leaf to create/delete child leafs of the same type. 
   
-  moreover, if the template leaf has '_mandatory_' bool node set, at least one leaf of this kind must exists in the JSON (it can't be
-  removed by the user) 
+  moreover, if the template leaf has '_mandatory_' bool node set, at least one leaf of this kind must exist in the 
+  JSON (it can't be removed by the user) 
  
-. each widget have its own options, using the format "_option_:JSONtag", which means apply this option to the node named <JSONtag>.
-  supported options are:
+. each widget have its own options, using the format "_option_:JSONtag", which means 'apply this option to the node 
+  named <JSONtag>'. supported options are:
   
   QLineEdit: '_regexp_' to set a regular expression validator on the editor.
   QSpinBox: '_valuemax_' and '_valuemin_' to set min/max limits of the spinbox.
