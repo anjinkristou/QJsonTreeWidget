@@ -19,20 +19,14 @@ FORMS    += \
     dialog.ui
 
 INCLUDEPATH += ../src \
-    ../qjson/include
+    ../../qjson/include
 
 LIBS += -L$$OUT_PWD/../qjsontreewidget/lib -lqjsontreewidget
-LIBS += -L$$OUT_PWD/../qjson/lib -lqjson
+LIBS += -L$$PWD/../../qjson/lib -lqjson
 
 jsonfiles.files = *.json
 jsonfiles.path = $$OUT_PWD/$(DESTDIR)
 INSTALLS += jsonfiles
-
-#win32 {
-#binfiles.files = $$OUT_PWD/../qjson/lib/*.dll
-#binfiles.path = $$OUT_PWD/$(DESTDIR)
-#INSTALLS += binfiles
-#}
 
 POST_TARGETDEPS += install
 

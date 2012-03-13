@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 CONFIG += ordered
-SUBDIRS += qjson \
+SUBDIRS += ../qjson \
   src \
   test

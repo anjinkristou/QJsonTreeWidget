@@ -20,4 +20,4 @@ HEADERS += qjsontreewidget.h \
     qjsontreeitem.h \
     qjsontreeitemdelegate.h
 
-INCLUDEPATH += ../qjson/include
+INCLUDEPATH += ../../qjson/include
