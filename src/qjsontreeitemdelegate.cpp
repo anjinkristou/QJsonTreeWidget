@@ -176,7 +176,7 @@ void QJsonTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
   if (ce == QStyle::CE_CheckBox)
   {
     // draw a checkbox
-    drawButton(option,painter,QStyle::CE_CheckBox,QString(),m.value(h["__tag__"].toString(),false).toBool());
+    drawButton(option,painter,QStyle::CE_CheckBox,QString(),QString(),m.value(h["__tag__"].toString(),false).toBool());
     return;
   }
 
@@ -196,18 +196,18 @@ void QJsonTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
   }
 
   // see what we have to draw
-  int idx=tagval.indexOf(",");
-  if (idx == -1)
+  // ,, separated string: 0:widget, 1:text, 2:optional pixmap
+  QStringList l = tagval.split(",,");
+  if (l.isEmpty())
   {
-    QStyledItemDelegate::paint(painter,option,index);
-    return;
+      QStyledItemDelegate::paint(painter,option,index);
+      return;
   }
-  w = tagval.mid(0,idx);
-  ce = m_widgetTypes.value(w,(QStyle::ControlElement)-1);
+  ce = m_widgetTypes.value(l.at(0),(QStyle::ControlElement)-1);
   if (ce == QStyle::CE_PushButton)
   {
       // draw a pushbutton
-      drawButton(option,painter,QStyle::CE_PushButton,tagval.mid(idx+1));
+      drawButton(option,painter,QStyle::CE_PushButton,l.count()>=2 ? l.at(1):QString(),l.count()==3 ? l.at(2):QString());
       return;
   }
 }
@@ -246,7 +246,7 @@ bool QJsonTreeItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model
   return false;
 }
 
-void QJsonTreeItemDelegate::drawButton(const QStyleOptionViewItem &option, QPainter* painter, const QStyle::ControlElement type, const QString &text, bool checked) const
+void QJsonTreeItemDelegate::drawButton(const QStyleOptionViewItem &option, QPainter* painter, const QStyle::ControlElement type, const QString &text, const QString& pixmap, bool checked) const
 {
   // copy the options from the provided one
   QStyleOptionButton opts;
@@ -255,7 +255,13 @@ void QJsonTreeItemDelegate::drawButton(const QStyleOptionViewItem &option, QPain
   opts.direction = option.direction;
   opts.state = option.state;
   checked ? opts.state |= QStyle::State_On : opts.state |= QStyle::State_Off;
-  opts.text = text;
+  if (!pixmap.isEmpty())
+  {
+      opts.icon = QIcon(pixmap);
+      opts.iconSize = QSize(16,16);
+  }
+  if (!text.isEmpty())
+      opts.text = text;
   QApplication::style()->drawControl(type,&opts,painter);
 }
 

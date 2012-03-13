@@ -27,7 +27,9 @@ Usage is really simple, you just have to adopt this format for your tree:
   "value": yourvalue, "_widget_:value": "QLineEdit"
   
    to display a static widget:
-  "button1": "QPushButton,buttontext"
+  "button1": "QPushButton,,buttontext,,pixmap"
+   where pixmap is a 16x16 icon stored in your resources (i.e. :/images/pixmaps/icon.png). 
+   both icon and text can be present, or just one (i.e. QPushButton,,,,pixmap for no text and icon)
 
 . every leaf can have a '_hide_' parameter, which hides the whole leaf from displaying. 
   moreover, if you use '_hide_:JSONtag' you can selectively hide only the node named <JSONtag>.

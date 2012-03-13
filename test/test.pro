@@ -21,7 +21,7 @@ FORMS    += \
 INCLUDEPATH += ../src \
     ../../qjson/include
 
-LIBS += -L$$OUT_PWD/../qjsontreewidget/lib -lqjsontreewidget
+LIBS += -L$$PWD/../../qjsontreewidget/lib -lqjsontreewidget
 LIBS += -L$$PWD/../../qjson/lib -lqjson
 
 jsonfiles.files = *.json

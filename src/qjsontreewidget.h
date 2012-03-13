@@ -56,6 +56,13 @@
    QTreeView* view() const { return m_view; }
 
    /**
+    * @brief returns the model
+    *
+    * @return QJSonTreeModel
+    */
+   QJsonTreeModel* model() const { return m_model; }
+
+   /**
     * @brief returns the optional QGridLayout where the user can add its own controls
     *
     * @return QGridLayout

@@ -23,12 +23,16 @@ QJsonTreeModel::QJsonTreeModel(QObject *parent) :
   QAbstractItemModel(parent)
 {
   m_root = 0;
+  m_parser = new QJson::Parser();
+  m_serializer = new QJson::Serializer();
   this->clear();
 }
 
 QJsonTreeModel::~QJsonTreeModel()
 {
   this->clear();
+  delete m_parser;
+  delete m_serializer;
 }
 
 bool QJsonTreeModel::buildModel(const QByteArray& buf)
@@ -37,13 +41,13 @@ bool QJsonTreeModel::buildModel(const QByteArray& buf)
 
   // delete the existing tree and reset the model
   this->clear();
-  m_serializer.setIndentMode(QJson::IndentNone);
+  m_serializer->setIndentMode(QJson::IndentNone);
 
   // parse
-  QVariantMap map = m_parser.parse(buf,&ok).toMap();
+  QVariantMap map = m_parser->parse(buf,&ok).toMap();
   if (!ok)
   {
-      m_error = tr("buildModel: JSON parser error: line %1, %2").arg(QVariant(m_parser.errorLine()).toString()).arg(m_parser.errorString());
+      m_error = tr("buildModel: JSON parser error: line %1, %2").arg(QVariant(m_parser->errorLine()).toString()).arg(m_parser->errorString());
       return false;
   }
   int v = jsonVersion(map);
@@ -73,7 +77,7 @@ bool QJsonTreeModel::buildModel(const QByteArray& buf)
   if (!m_root->isValid())
   {
     // something wrong with the invisible root item (probably header)
-    QByteArray invalid = m_serializer.serialize(m_root->invalidMap());
+    QByteArray invalid = m_serializer->serialize(m_root->invalidMap());
     setNotFoundInvalidOrEmptyError("buildModel",invalid);
     this->clear();
     return false;
@@ -83,7 +87,7 @@ bool QJsonTreeModel::buildModel(const QByteArray& buf)
   if (!m_root->isValid())
   {
     // something wrong with the real root item (probably header)
-    QByteArray invalid = m_serializer.serialize(m_root->invalidMap());
+    QByteArray invalid = m_serializer->serialize(m_root->invalidMap());
     setNotFoundInvalidOrEmptyError("buildModel",invalid);
     this->clear();
     return false;
@@ -145,8 +149,8 @@ bool QJsonTreeModel::saveJson(QIODevice &dev, QJson::IndentMode indentmode)
 
 QByteArray QJsonTreeModel::saveJson(QJson::IndentMode indentmode)
 {
-  m_serializer.setIndentMode(indentmode);
-  return m_serializer.serialize(m_root->child(0)->toMap());
+  m_serializer->setIndentMode(indentmode);
+  return m_serializer->serialize(m_root->child(0)->toMap());
 }
 
 void QJsonTreeModel::setNotFoundInvalidOrEmptyError(const QString &function, const QString &val)

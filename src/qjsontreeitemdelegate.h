@@ -22,7 +22,7 @@
 
 #include <QtCore>
 #include <QtGui>
-#include <qjsontreemodel.h>
+#include "qjsontreemodel.h"
 
 /**
  * @brief class to display/edit data using the QJsonTreeModel model class
@@ -103,7 +103,7 @@ private:
     int countParentChildsByName(QJsonTreeItem *item, const QString &name) const;
     void handleLeftMousePress(QAbstractItemModel *model, const QModelIndex &index);
     void handleRightMousePress(QMouseEvent *event, QAbstractItemModel *model, const QModelIndex &index);
-    void drawButton(const QStyleOptionViewItem &option, QPainter *painter, const QStyle::ControlElement type, const QString &text=QString(), bool checked=false) const;
+    void drawButton(const QStyleOptionViewItem &option, QPainter *painter, const QStyle::ControlElement type, const QString &text=QString(), const QString& pixmap=QString(), bool checked=false) const;
     QHash<QString,QStyle::ControlElement> m_widgetTypes;
     void buildWidgetTypes();
     void execMenu(QJsonTreeModel *model, const QModelIndex &index, QJsonTreeItem *item, QMenu *menu, const QPoint &pos) const;

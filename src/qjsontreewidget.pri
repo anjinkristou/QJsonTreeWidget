@@ -8,7 +8,7 @@ TARGET = qjsontreewidget
 TEMPLATE = lib
 CONFIG += staticlib
 
-DESTDIR  =../qjsontreewidget/lib
+DESTDIR  =../lib
 
 SOURCES += qjsontreewidget.cpp \
     qjsontreemodel.cpp \

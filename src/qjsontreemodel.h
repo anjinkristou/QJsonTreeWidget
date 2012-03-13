@@ -312,13 +312,27 @@ public:
    */
   QVariantMap mapByModelIndex (const QModelIndex& index, QJsonTreeItem** item=0,int role = Qt::DisplayRole) const;
 
+  /**
+   * @brief returns the QJSON serializer
+   *
+   * return QJson::Serializer
+   */
+  QJson::Serializer* serializer() const { return m_serializer; }
+
+  /**
+   * @brief returns the QJSON parser
+   *
+   * return QJson::Parser
+   */
+  QJson::Parser* parser() const { return m_parser; }
+
   private:
   bool buildModel(const QByteArray& buf);
   void setNotFoundInvalidOrEmptyError(const QString& function,const QString& val);
   QJsonTreeItem* parentItem(const QModelIndex& parent) const;
   QJsonTreeItem* m_root;
-  QJson::Parser m_parser;
-  QJson::Serializer m_serializer;
+  QJson::Parser* m_parser;
+  QJson::Serializer* m_serializer;
   QString m_error;
   QJsonTreeItem::SpecialFlags m_specialFlags;
   int m_maxVersion;
