@@ -1,4 +1,12 @@
-QJsonTreeWidget uses QJSon library by Fabio Castelli (http://qjson.sourceforge.net), it must be checkouted in the libs folder.
+QJsonTreeWidget uses QJSon library by Fabio Castelli (http://qjson.sourceforge.net), it must be checkouted at the same
+level of the qjsontreewidget folder :
 
-Then, just open the cfgtest.pro in QtCreator and compile.
+qjsontreewidget/
+ src/
+ qjson/
+ ...
+
+Then, just open the qjsontreewidget.pro in QtCreator and compile. A test application can be found in <outdir>/test.
+
+to deploy, you have to take care yourself of distributing the qjson DLL/.so with your application.
 
