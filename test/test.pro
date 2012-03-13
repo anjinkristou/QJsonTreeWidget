@@ -18,26 +18,24 @@ HEADERS  += \
 FORMS    += \
     dialog.ui
 
-INCLUDEPATH += $$PWD/../libs/qjsontreewidget \
-    $$PWD/../libs/qjson
+INCLUDEPATH += ../src \
+    ../qjson/include
 
-LIBS += -L$$OUT_PWD/../libs/qjsontreewidget -lqjsontreewidget
-LIBS += -L$$OUT_PWD/../libs/qjson/ -lqjson
+LIBS += -L$$OUT_PWD/../qjsontreewidget/lib -lqjsontreewidget
+LIBS += -L$$OUT_PWD/../qjson/lib -lqjson
 
 jsonfiles.files = *.json
-jsonfiles.path = $$OUT_PWD
-
-win32 {
-binfiles.files = $$OUT_PWD/../libs/qjson/*.dll
-binfiles.path = $$OUT_PWD
-INSTALLS += binfiles
-}
-
+jsonfiles.path = $$OUT_PWD/$(DESTDIR)
 INSTALLS += jsonfiles
+
+#win32 {
+#binfiles.files = $$OUT_PWD/../qjson/lib/*.dll
+#binfiles.path = $$OUT_PWD/$(DESTDIR)
+#INSTALLS += binfiles
+#}
 
 POST_TARGETDEPS += install
 
 OTHER_FILES += \
     rkcfg.json \
     test.json
-

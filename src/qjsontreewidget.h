@@ -22,7 +22,6 @@
 
 #include <QtCore>
 #include <QtGui>
-#include <parser.h>
 #include "qjsontreemodel.h"
 #include "qjsontreeitemdelegate.h"
 

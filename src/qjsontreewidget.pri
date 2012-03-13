@@ -8,6 +8,8 @@ TARGET = qjsontreewidget
 TEMPLATE = lib
 CONFIG += staticlib
 
+DESTDIR  =../qjsontreewidget/lib
+
 SOURCES += qjsontreewidget.cpp \
     qjsontreemodel.cpp \
     qjsontreeitem.cpp \
@@ -18,4 +20,4 @@ HEADERS += qjsontreewidget.h \
     qjsontreeitem.h \
     qjsontreeitemdelegate.h
 
-INCLUDEPATH += $$PWD/../qjson
+INCLUDEPATH += ../qjson/include
