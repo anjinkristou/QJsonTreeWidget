@@ -105,26 +105,29 @@
     *
     * @param path path to the JSON file to be saved
     * @param indentmode one of the indentation mode defined in QJson::IndentMode
+    * @param additional an optional additional map to be added
     * @return bool
     */
-   bool saveJson(const QString& path, QJson::IndentMode indentmode) { return m_model->saveJson(path, indentmode); }
+   bool saveJson(const QString& path, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap() ) { return m_model->saveJson(path, indentmode,additional); }
 
    /**
     * @brief serializes the tree to a QIODevice file
     *
     * @param dev a QIODevice (i.e. QFile)
     * @param indentmode one of the indentation mode defined in QJson::IndentMode
+    * @param additional an optional additional map to be added
     * @return bool
     */
-   bool saveJson (QIODevice& dev, QJson::IndentMode indentmode) { return m_model->saveJson(dev,indentmode); }
+   bool saveJson (QIODevice& dev, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap()) { return m_model->saveJson(dev,indentmode,additional); }
 
    /**
     * @brief serializes the tree to a JSON buffer
     *
     * @param indentmode one of the indentation mode defined in QJson::IndentMode
+    * @param additional an optional additional map to be added
     * @return QByteArray
     */
-   QByteArray saveJson (QJson::IndentMode indentmode) { return m_model->saveJson(indentmode); }
+   QByteArray saveJson (QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap()) { return m_model->saveJson(indentmode,additional); }
 
    /**
     * @brief expands all the items in the tree (warning: if the view contains lot of items, it may take time)
