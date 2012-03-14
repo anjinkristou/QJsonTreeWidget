@@ -217,7 +217,7 @@
     * @brief connect to this signal to be notified of mouseclicks on a pushbutton in the view (_button_ JSON tag)
     * essentially this is a shortcut for the above more complete signal
     * @param item the corresponding QJsonTreeItem* (you can get the full map calling item->map())
-    * @param item the corresponding JSON tag at the position identified by column and row in the tree
+    * @param jsontag the corresponding JSON tag at the position identified by column and row in the tree
     */
    void clicked (const QJsonTreeItem* item, const QString& jsontag);
 
