@@ -67,7 +67,7 @@ bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
     m_rootItem = parent->rootItem();
   }
 
-  // name is mandatory (except in the invisible root item)
+  /*// name is mandatory (except in the invisible root item)
   if (!m_map.contains("name") && (m_rootItem != this))
   {
     m_error = QJsonTreeItem::JsonInvalidMap;
@@ -78,7 +78,7 @@ bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
     m_rootItem->m_invalidMap = m_invalidMap;
     return false;
   }
-
+  */
   // this is to optimize model index() function
   foreach (QString k, m_map.keys())
   {

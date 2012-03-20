@@ -26,7 +26,7 @@
 #include <QJson/Parser>
 #include <QJson/QObjectHelper>
 
-#define JSON_TREE_MAX_VERSION 2 // maximum supported JSON version by the library
+#define JSON_TREE_MAX_VERSION 3 // maximum supported JSON version by the library
 #define MAX_ROWS_FOR_FETCH 100 // fetch this number of rows per time (for bigger trees)
 
 /**

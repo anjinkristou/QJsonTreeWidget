@@ -62,6 +62,13 @@ bool QJsonTreeModel::buildModel(const QByteArray& buf)
     return false;
   }
 
+  QVariantMap blob = map.value("_blob_",QVariantMap()).toMap();
+  if (!blob.isEmpty())
+  {
+      // we use blob instead (for embedded trees into another map)
+      map = blob;
+  }
+
   // create the root item. the root item is invisible, we use it only to store the headers hash.
   // so we need only _headers_ in it
   QString hdrstring = map.value("_headers_",QString()).toString();
@@ -411,8 +418,10 @@ void QJsonTreeModel::fetchMore(const QModelIndex &parent)
   if (!item)
     return;
   int tofetch = qMin(m_maxRows,item->childCount() - item->fetchedChildren());
+  if (tofetch == 0)
+      return;
 
-  beginInsertRows(parent,item->fetchedChildren(),tofetch+1);
+  beginInsertRows(parent,0,tofetch+1);
   item->setFetchedChildren(item->fetchedChildren()+tofetch);
   endInsertRows();
 }
