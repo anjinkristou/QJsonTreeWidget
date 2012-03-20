@@ -9,7 +9,7 @@ Usage is really simple, you just have to adopt this format for your tree:
 . each line of the JSON file should represent a leaf in your tree (this eases maintenance by hand, but really 
   you can indent your JSON whatever you prefer), embodied in a JSON object.
 
-. each leaf must have a '_desc_' and a 'name' node. if it's a parent node, it must have a '_children_' JSON node.
+. each leaf should have at least a '_desc_' and a 'name' node (not mandatory). if it's a parent node, it must have a '_children_' JSON node.
 
 . the root JSON object must have a 'version' node (to support versioning) and a '_headers_' node'. 
   format of the _headers_ node is <columndisplayname:JSONtag:columnidx[:draw],...>
