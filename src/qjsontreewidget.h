@@ -101,6 +101,14 @@
    bool loadJson (const QByteArray& buf);
 
    /**
+    * @brief
+    *
+    * @param buf a QVariant map
+    * @return bool false if the map do not contain valid data for QJsonTreeWidget, look at error() for detailed error string
+    */
+   bool loadJson (const QVariantMap& map);
+
+   /**
     * @brief serializes the tree to a JSON file
     *
     * @param path path to the JSON file to be saved
@@ -128,6 +136,13 @@
     * @return QByteArray
     */
    QByteArray saveJson (QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap()) { return m_model->saveJson(indentmode,additional); }
+
+   /**
+    * @brief saves the tree to a QVariantMap
+    *
+    * @return QVariantMap
+    */
+   QVariantMap saveJson () const { return m_model->root()->toMap(); }
 
    /**
     * @brief expands all the items in the tree (warning: if the view contains lot of items, it may take time)

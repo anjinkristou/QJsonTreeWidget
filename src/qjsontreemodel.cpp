@@ -35,21 +35,18 @@ QJsonTreeModel::~QJsonTreeModel()
   delete m_serializer;
 }
 
-bool QJsonTreeModel::buildModel(const QByteArray& buf)
+bool QJsonTreeModel::buildModel(const QVariantMap& map)
 {
-  bool ok;
+  if (map.isEmpty())
+  {
+      setNotFoundInvalidOrEmptyError("buildModel","map");
+      return false;
+  }
 
   // delete the existing tree and reset the model
   this->clear();
   m_serializer->setIndentMode(QJson::IndentNone);
 
-  // parse
-  QVariantMap map = m_parser->parse(buf,&ok).toMap();
-  if (!ok)
-  {
-      m_error = tr("buildModel: JSON parser error: line %1, %2").arg(QVariant(m_parser->errorLine()).toString()).arg(m_parser->errorString());
-      return false;
-  }
   int v = jsonVersion(map);
   if (v == -1)
   {
@@ -62,16 +59,17 @@ bool QJsonTreeModel::buildModel(const QByteArray& buf)
     return false;
   }
 
+  QVariantMap maptouse = map;
   QVariantMap blob = map.value("_blob_",QVariantMap()).toMap();
   if (!blob.isEmpty())
   {
       // we use blob instead (for embedded trees into another map)
-      map = blob;
+      maptouse = blob;
   }
 
   // create the root item. the root item is invisible, we use it only to store the headers hash.
   // so we need only _headers_ in it
-  QString hdrstring = map.value("_headers_",QString()).toString();
+  QString hdrstring = maptouse.value("_headers_",QString()).toString();
   if (hdrstring.isEmpty())
   {
     setNotFoundInvalidOrEmptyError("buildModel","_headers_");
@@ -90,7 +88,7 @@ bool QJsonTreeModel::buildModel(const QByteArray& buf)
     return false;
   }
 
-  QJsonTreeItem* r = new QJsonTreeItem(m_root,map); // this is the real root, 1st child of invisibleroot
+  QJsonTreeItem* r = new QJsonTreeItem(m_root,maptouse); // this is the real root, 1st child of invisibleroot
   if (!m_root->isValid())
   {
     // something wrong with the real root item (probably header)
@@ -125,7 +123,22 @@ bool QJsonTreeModel::loadJson(const QByteArray &buf)
     setNotFoundInvalidOrEmptyError("loadJson","buf");
     return false;
   }
-  return buildModel(buf);
+
+  // parse
+  bool ok;
+  QVariantMap map = m_parser->parse(buf,&ok).toMap();
+  if (!ok)
+  {
+      m_error = tr("loadJson: JSON parser error: line %1, %2").arg(QVariant(m_parser->errorLine()).toString()).arg(m_parser->errorString());
+      return false;
+  }
+
+  return loadJson(map);
+}
+
+bool QJsonTreeModel::loadJson(const QVariantMap &map)
+{
+    return buildModel(map);
 }
 
 bool QJsonTreeModel::saveJson(const QString &path, QJson::IndentMode indentmode, const QVariantMap& additional)

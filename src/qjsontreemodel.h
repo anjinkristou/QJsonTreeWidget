@@ -90,6 +90,14 @@ public:
   bool loadJson (const QByteArray& buf);
 
   /**
+   * @brief
+   *
+   * @param buf a QVariant map
+   * @return bool false if the map do not contain valid data for QJsonTreeWidget, look at error() for detailed error string
+   */
+  bool loadJson (const QVariantMap& map);
+
+  /**
    * @brief serializes the tree to a JSON file
    *
    * @param path path to the JSON file to be saved
@@ -330,7 +338,7 @@ public:
   QJson::Parser* parser() const { return m_parser; }
 
   private:
-  bool buildModel(const QByteArray& buf);
+  bool buildModel(const QVariantMap& map);
   void setNotFoundInvalidOrEmptyError(const QString& function,const QString& val);
   QJsonTreeItem* parentItem(const QModelIndex& parent) const;
   QJsonTreeItem* m_root;

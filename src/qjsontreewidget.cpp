@@ -73,6 +73,22 @@ bool QJsonTreeWidget::loadJson(const QByteArray &buf)
   return true;
 }
 
+bool QJsonTreeWidget::loadJson(QIODevice &dev)
+{
+  if (!m_model->loadJson(dev))
+    return false;
+  m_view->setModel(m_model);
+  return true;
+}
+
+bool QJsonTreeWidget::loadJson(const QVariantMap &map)
+{
+    if (!m_model->loadJson(map))
+      return false;
+    m_view->setModel(m_model);
+    return true;
+}
+
 void QJsonTreeWidget::resizeColumnsToContents()
 {
   for (int i=0; i < this->invisibleRootItem()->columnCount(); i++)
@@ -92,10 +108,3 @@ void QJsonTreeWidget::onDataChanged(const QModelIndex &topLeft, const QModelInde
   m_view->update(topLeft);
 }
 
-bool QJsonTreeWidget::loadJson(QIODevice &dev)
-{
-  if (!m_model->loadJson(dev))
-    return false;
-  m_view->setModel(m_model);
-  return true;
-}
