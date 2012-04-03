@@ -22,8 +22,14 @@
 
 #include <QtCore>
 #include <QtGui>
+#include <QJson/Serializer>
+#include <QJson/Parser>
+#include <QJson/QObjectHelper>
 #include "qjsontreemodel.h"
 #include "qjsontreeitemdelegate.h"
+#include "qjsonsortfilterproxymodel.h"
+
+#define JSON_TREE_MAX_VERSION 3 // maximum supported JSON version by the library
 
 /**
   * @brief class to represent a JSON file using a tree widget and viceversa.
@@ -33,6 +39,9 @@
  class QJsonTreeWidget : public QWidget{
  Q_OBJECT
  public:
+
+   friend class QJsonTreeItem;
+   friend class QJsonTreeModel;
 
    /**
     * @brief
@@ -49,20 +58,6 @@
    ~QJsonTreeWidget();
 
    /**
-    * @brief returns the QTreeView
-    *
-    * @return QTreeView
-    */
-   QTreeView* view() const { return m_view; }
-
-   /**
-    * @brief returns the model
-    *
-    * @return QJSonTreeModel
-    */
-   QJsonTreeModel* model() const { return m_model; }
-
-   /**
     * @brief returns the optional QGridLayout where the user can add its own controls
     *
     * @return QGridLayout
@@ -70,11 +65,11 @@
    QGridLayout* optLayout() const { return m_optLayout; }
 
    /**
-    * @brief returns detailed error from the underlying model
+    * @brief returns detailed error
     *
     * @return const QString
     */
-   const QString error() const { return m_model->error(); }
+   const QString error() const { return m_error; }
 
    /**
     * @brief
@@ -116,7 +111,7 @@
     * @param additional an optional additional map to be added
     * @return bool
     */
-   bool saveJson(const QString& path, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap() ) { return m_model->saveJson(path, indentmode,additional); }
+   bool saveJson(const QString& path, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
 
    /**
     * @brief serializes the tree to a QIODevice file
@@ -126,7 +121,7 @@
     * @param additional an optional additional map to be added
     * @return bool
     */
-   bool saveJson (QIODevice& dev, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap()) { return m_model->saveJson(dev,indentmode,additional); }
+   bool saveJson (QIODevice& dev, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
 
    /**
     * @brief serializes the tree to a JSON buffer
@@ -135,7 +130,7 @@
     * @param additional an optional additional map to be added
     * @return QByteArray
     */
-   QByteArray saveJson (QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap()) { return m_model->saveJson(indentmode,additional); }
+   QByteArray saveJson (QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
 
    /**
     * @brief saves the tree to a QVariantMap
@@ -216,7 +211,72 @@
     */
    QHeaderView* header() { return m_view->header(); }
 
-   signals:
+   /**
+    * @brief returns the QJSON serializer
+    *
+    * return QJson::Serializer
+    */
+   QJson::Serializer* serializer() const { return m_serializer; }
+
+   /**
+    * @brief returns the QJSON parser
+    *
+    * return QJson::Parser
+    */
+   QJson::Parser* parser() const { return m_parser; }
+
+   /**
+    * @brief returns the version of JSON map to be represented (tag "version" in the map)
+    *
+    * @param map the JSON map
+    * @return int
+    */
+   int jsonVersion(const QVariantMap map) const;
+
+   /**
+    * @brief returns the maximum supported JSON tree version by the library
+    *
+    * @return int
+    */
+   int jsonMaxSupportedVersion() const { return m_maxVersion; }
+
+   /**
+    * @brief enable or disable the dynamic sort/filtering
+    *
+    * @param enable view is sorted on insertion/deletion too, if sorting is enabled
+    */
+   void setDynamicSortFiltering(bool enable) { m_proxyModel->setDynamicSortFilter(enable); }
+
+   /**
+    * @brief enable or disable sorting
+    *
+    * @param enable enable/disable sorting in the view
+    */
+   void setSortingEnabled(bool enable);
+
+   /**
+    * @brief sets the sort order (ascending/descending)
+    *
+    * @param column column to set the sort order to
+    * @param order the sort order (items are sorted in respect of the tree structure)
+    */
+   void setSortOrder(int column, Qt::SortOrder order) { m_view->header()->setSortIndicator(column,order); }
+
+   /**
+    * @brief recursively search text in the tree
+    *
+    * @param text the text to find
+    */
+   void search(const QString& text);
+
+   /**
+    * @brief recursively search text in the tree
+    *
+    * @param regex the regexp to match
+    */
+   void search(const QRegExp& regex);
+
+ signals:
    /**
     * @brief connect to this signal to be notified of generic mouseclicks on the view
     *
@@ -238,13 +298,30 @@
 
  private slots:
    void onDataChanged (const QModelIndex & topLeft, const QModelIndex & bottomRight );
+   void nextSelection();
+
+ protected:
+   QJsonSortFilterProxyModel* proxyModel() const { return m_proxyModel; }
+   QTreeView* view() const { return m_view; }
+   QJsonTreeModel* model() const { return m_model; }
+   bool loadJsonInternal(const QVariantMap &map);
+   void setNotFoundInvalidOrEmptyError(const QString &function, const QString &val);
+   void keyPressEvent(QKeyEvent *event);
 
  private:
+   void searchInternal();
+
    QTreeView* m_view;
    QGridLayout* m_optLayout;
    QJsonTreeModel* m_model;
+   QJsonSortFilterProxyModel* m_proxyModel;
+   QJsonTreeItem* m_root;
    QJsonTreeItemDelegate* m_delegate;
    QString m_error;
+   QJson::Parser* m_parser;
+   QJson::Serializer* m_serializer;
+   QModelIndex m_currentSelection;
+   int m_maxVersion;
  };
 
 #endif // QJSONTREEWIDGET_H

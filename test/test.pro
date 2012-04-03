@@ -18,11 +18,11 @@ HEADERS  += \
 FORMS    += \
     dialog.ui
 
-INCLUDEPATH += ../src \
-    ../../qjson/include
+INCLUDEPATH += ../libs/qjsontreewidget \
+    ../libs/qjson/include
 
-LIBS += -L$$PWD/../../qjsontreewidget/lib -lqjsontreewidget
-LIBS += -L$$PWD/../../qjson/lib -lqjson
+LIBS += -L../libs/qjsontreewidget/lib -lqjsontreewidget
+LIBS += -L../libs/qjson/lib -lqjson
 
 jsonfiles.files = *.json
 jsonfiles.path = $$OUT_PWD/$(DESTDIR)
@@ -33,3 +33,4 @@ POST_TARGETDEPS += install
 OTHER_FILES += \
     rkcfg.json \
     test.json
+

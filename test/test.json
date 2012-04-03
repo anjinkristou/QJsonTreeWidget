@@ -5,7 +5,7 @@
     { "_desc_" : "Checkbox sample", "name" : "foocheckbox", "value" : true, "_widget_:value" : "QCheckBox" },
     { "_desc_" : "Hidden sample", "_hide_":true, "name" : "foocheckbox2", "value" : true, "_widget_:value" : "QCheckBox" },
     { "_desc_" : "Sample with hidden value", "name" : "foocheckbox3", "value" : true, "_widget_:value" : "QCheckBox", "anothervalue" : true, "_widget_:anothervalue" : "QCheckBox", "_hide_:anothervalue":true },
-    { "_desc_" : "Test button clicks", "name" : "testbutton1", "_button1_": "QPushButton,clickme!", "_button2_": "QPushButton,clickme2!" }
+    { "_desc_" : "Test button clicks", "name" : "testbutton1", "_button1_": "QPushButton,,clickme!", "_button2_": "QPushButton,,clickme2!" }
   ] },
   { "_desc_" : "Another tree", "name" : "tree2", "_widget_:value" : "Tree", "_children_" : [
     { "_desc_" : "A subtree", "name" : "tree3", "_widget_:value" : "Tree", "_children_" : [

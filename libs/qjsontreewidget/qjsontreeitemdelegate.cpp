@@ -18,6 +18,7 @@
  */
 
 #include "qjsontreeitemdelegate.h"
+#include "qjsontreewidget.h"
 
 QJsonTreeItemDelegate::QJsonTreeItemDelegate(QObject *parent) :
   QStyledItemDelegate(parent)
@@ -26,13 +27,19 @@ QJsonTreeItemDelegate::QJsonTreeItemDelegate(QObject *parent) :
   buildWidgetTypes();
 }
 
+QJsonTreeItemDelegate::~QJsonTreeItemDelegate()
+{
+  qDebug() << "~QJsonTreeItemDelegate()";
+}
+
 QWidget *QJsonTreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  QJsonTreeModel* model = (QJsonTreeModel*)index.model();
+  QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
+  const QJsonTreeModel* model = static_cast<const QJsonTreeModel*>(idx.model());
 
   // get tag for this index
   QJsonTreeItem* item;
-  QString tag = model->tagByModelIndex(index,&item);
+  QString tag = model->tagByModelIndex(idx,&item);
   if (tag.isEmpty())
     return 0;
 
@@ -91,7 +98,8 @@ QWidget *QJsonTreeItemDelegate::createEditor(QWidget *parent, const QStyleOption
 
 void QJsonTreeItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-  QVariant val = index.model()->data(index,Qt::DisplayRole);
+  QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
+  QVariant val = idx.model()->data(idx,Qt::DisplayRole);
   QString n (editor->metaObject()->className());
 
   if (n.compare("QCheckBox",Qt::CaseInsensitive) == 0)
@@ -107,9 +115,9 @@ void QJsonTreeItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
   else if (n.compare("QComboBox",Qt::CaseInsensitive) == 0)
   {
     QComboBox* w = static_cast<QComboBox*>(editor);
-    int idx = w->findText(val.toString(),Qt::MatchExactly);
-    if (idx != -1)
-      w->setCurrentIndex(idx);
+    int i = w->findText(val.toString(),Qt::MatchExactly);
+    if (i != -1)
+      w->setCurrentIndex(i);
   }
   else if (n.compare("QLineEdit",Qt::CaseInsensitive) == 0)
   {
@@ -120,6 +128,7 @@ void QJsonTreeItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 
 void QJsonTreeItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
+  // we use the proxy model index here, since we set data
   QString n (editor->metaObject()->className());
 
   if (n.compare("QCheckBox",Qt::CaseInsensitive) == 0)
@@ -158,17 +167,18 @@ void QJsonTreeItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
 
 void QJsonTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  QJsonTreeModel* model = (QJsonTreeModel*)index.model();
+  QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
+  const QJsonTreeModel* model = static_cast<const QJsonTreeModel*>(idx.model());
   QJsonTreeItem* it;
-  QVariantMap m = model->mapByModelIndex(index,&it);
+  QVariantMap m = model->mapByModelIndex(idx,&it);
   if (m.isEmpty())
   {
-    QStyledItemDelegate::paint(painter,option,index);
+    QStyledItemDelegate::paint(painter,option,idx);
     return;
   }
 
   // get headers hash
-  QHash<QString,QVariant> h = it->headerHashByIdx(index.column());
+  QHash<QString,QVariant> h = it->headerHashByIdx(idx.column());
 
   // we always paint the checkbox
   QString w = m.value("_widget_:" % h["__tag__"].toString(),QString()).toString();
@@ -183,7 +193,7 @@ void QJsonTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
   // check if we need to paint something in this column
   if (!h["__draw__"].toBool())
   {
-    QStyledItemDelegate::paint(painter,option,index);
+    QStyledItemDelegate::paint(painter,option,idx);
     return;
   }
 
@@ -191,7 +201,7 @@ void QJsonTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
   QString tagval = m.value(h["__tag__"].toString(),QVariant()).toString();
   if (tagval.isEmpty())
   {
-    QStyledItemDelegate::paint(painter,option,index);
+    QStyledItemDelegate::paint(painter,option,idx);
     return;
   }
 
@@ -200,7 +210,7 @@ void QJsonTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
   QStringList l = tagval.split(",,");
   if (l.isEmpty())
   {
-      QStyledItemDelegate::paint(painter,option,index);
+      QStyledItemDelegate::paint(painter,option,idx);
       return;
   }
   ce = m_widgetTypes.value(l.at(0),(QStyle::ControlElement)-1);
@@ -220,6 +230,7 @@ void QJsonTreeItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOp
 bool QJsonTreeItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
   QMouseEvent* me;
+
   switch (event->type())
   {
     case QEvent::MouseButtonPress:
@@ -228,11 +239,11 @@ bool QJsonTreeItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model
       {
         case Qt::LeftButton:
           // left button pressed
-          handleLeftMousePress(model,index);
+          handleLeftMousePress(index);
         break;
         case Qt::RightButton:
           // right mouse pressed
-          handleRightMousePress(me,model,index);
+          handleRightMousePress(me,index);
         break;
         default:
           break;
@@ -271,25 +282,27 @@ void QJsonTreeItemDelegate::buildWidgetTypes()
   m_widgetTypes["QCheckBox"] = QStyle::CE_CheckBox;
 }
 
-void QJsonTreeItemDelegate::handleLeftMousePress(QAbstractItemModel* model, const QModelIndex &index)
+void QJsonTreeItemDelegate::handleLeftMousePress(const QModelIndex &index)
 {
+  QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
+  const QJsonTreeModel* model = QJsonSortFilterProxyModel::indexSourceModel(idx);
+
   // get item
   QJsonTreeItem* item;
-  QJsonTreeModel* md = (QJsonTreeModel*)model;
-  QVariantMap m = md->mapByModelIndex(index,&item);
+  QVariantMap m = model->mapByModelIndex(idx,&item);
   if (m.isEmpty())
     return;
 
   // get stuff from item
-  QString tag = item->headerTagByIdx(index.column());
+  QString tag = item->headerTagByIdx(idx.column());
   QVariant val = m.value(tag,QVariant());
 
   // check if there's hide or readonly set for this column
-  if ((m.value("_readonly_:" % tag, false).toBool() == true) && (md->specialFlags() & QJsonTreeItem::HonorReadOnly))
+  if ((m.value("_readonly_:" % tag, false).toBool() == true) && (model->specialFlags() & QJsonTreeItem::HonorReadOnly))
     return;
 
   // emit the generic signal
-  emit clicked(index.column(),index.row(),tag,val,item);
+  emit clicked(idx.column(),idx.row(),tag,val,item);
 
   // if it's a button, emit the button clicked signal too. this is just a shortcut for the above signal
   if (val.toString().startsWith("QPushButton,",Qt::CaseInsensitive) && !val.isNull())
@@ -298,11 +311,12 @@ void QJsonTreeItemDelegate::handleLeftMousePress(QAbstractItemModel* model, cons
   }
 }
 
-void QJsonTreeItemDelegate::handleRightMousePress(QMouseEvent* event, QAbstractItemModel* model, const QModelIndex &index)
+void QJsonTreeItemDelegate::handleRightMousePress(QMouseEvent* event, const QModelIndex &index)
 {
-  QJsonTreeModel* md = (QJsonTreeModel*)model;
+  QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
+  const QJsonTreeModel* model = QJsonSortFilterProxyModel::indexSourceModel(idx);
   QJsonTreeItem* item;
-  QVariantMap m = md->mapByModelIndex(index,&item);
+  QVariantMap m = model->mapByModelIndex(idx,&item);
   if (!item)
     return;
 
@@ -351,15 +365,19 @@ void QJsonTreeItemDelegate::handleRightMousePress(QMouseEvent* event, QAbstractI
   }
 
   // finally exec the menu
-  execMenu(md, index, item, menu, event->globalPos());
+  execMenu(idx, item, menu, event->globalPos());
   delete menu;
 }
 
-void QJsonTreeItemDelegate::execMenu(QJsonTreeModel* model, const QModelIndex& index, QJsonTreeItem* item, QMenu *menu, const QPoint& pos) const
+void QJsonTreeItemDelegate::execMenu(const QModelIndex& index, QJsonTreeItem* item, QMenu *menu, const QPoint& pos) const
 {
+  // index is already the converted proxy->source index
+  QJsonTreeModel* model = const_cast<QJsonTreeModel*>(static_cast<const QJsonTreeModel*>(index.model()));
   QAction* action = menu->exec(pos);
   if (action)
   {
+    QJsonTreeWidget* tree = model->root()->widget();
+    tree->setDynamicSortFiltering(false);
     if (action->data().canConvert(QVariant::Bool)) // we've set this before
     {
       // we must remove
@@ -375,6 +393,7 @@ void QJsonTreeItemDelegate::execMenu(QJsonTreeModel* model, const QModelIndex& i
       QModelIndex newidx = model->index(item->childCount() - 1,0,index);
       model->setData(newidx,mm);
     }
+    tree->setDynamicSortFiltering(true);
   }
 }
 

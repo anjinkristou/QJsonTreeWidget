@@ -19,179 +19,19 @@
 
 #include "qjsontreemodel.h"
 
-QJsonTreeModel::QJsonTreeModel(QObject *parent) :
+QJsonTreeModel::QJsonTreeModel(QJsonTreeItem* root, QObject *parent) :
   QAbstractItemModel(parent)
 {
-  m_root = 0;
-  m_parser = new QJson::Parser();
-  m_serializer = new QJson::Serializer();
-  this->clear();
+  m_specialFlags = (QJsonTreeItem::HonorReadOnly | QJsonTreeItem::HonorHide);
+  m_root = root;
 }
 
 QJsonTreeModel::~QJsonTreeModel()
 {
+  qDebug() << "~QJsonTreeModel()";
   this->clear();
-  delete m_parser;
-  delete m_serializer;
 }
 
-bool QJsonTreeModel::buildModel(const QVariantMap& map)
-{
-  if (map.isEmpty())
-  {
-      setNotFoundInvalidOrEmptyError("buildModel","map");
-      return false;
-  }
-
-  // delete the existing tree and reset the model
-  this->clear();
-  m_serializer->setIndentMode(QJson::IndentNone);
-
-  int v = jsonVersion(map);
-  if (v == -1)
-  {
-    setNotFoundInvalidOrEmptyError("buildModel","_version_");
-    return false;
-  }
-  if (v > m_maxVersion)
-  {
-    m_error = tr("buildModel: Unsupported JSON version: %1, maxversion: %2").arg(v).arg(m_maxVersion);
-    return false;
-  }
-
-  QVariantMap maptouse = map;
-  QVariantMap blob = map.value("_blob_",QVariantMap()).toMap();
-  if (!blob.isEmpty())
-  {
-      // we use blob instead (for embedded trees into another map)
-      maptouse = blob;
-  }
-
-  // create the root item. the root item is invisible, we use it only to store the headers hash.
-  // so we need only _headers_ in it
-  QString hdrstring = maptouse.value("_headers_",QString()).toString();
-  if (hdrstring.isEmpty())
-  {
-    setNotFoundInvalidOrEmptyError("buildModel","_headers_");
-    return false;
-  }
-
-  QVariantMap m;
-  m["_headers_"]=hdrstring;
-  m_root = new QJsonTreeItem(0,m);
-  if (!m_root->isValid())
-  {
-    // something wrong with the invisible root item (probably header)
-    QByteArray invalid = m_serializer->serialize(m_root->invalidMap());
-    setNotFoundInvalidOrEmptyError("buildModel",invalid);
-    this->clear();
-    return false;
-  }
-
-  QJsonTreeItem* r = new QJsonTreeItem(m_root,maptouse); // this is the real root, 1st child of invisibleroot
-  if (!m_root->isValid())
-  {
-    // something wrong with the real root item (probably header)
-    QByteArray invalid = m_serializer->serialize(m_root->invalidMap());
-    setNotFoundInvalidOrEmptyError("buildModel",invalid);
-    this->clear();
-    return false;
-  }
-
-  m_root->appendChild(r);
-  return true;
-}
-
-bool QJsonTreeModel::loadJson(const QString &path)
-{
-  QFile file(path);
-  file.open(QIODevice::ReadOnly);
-  bool b = loadJson(file);
-  file.close();
-  return b;
-}
-
-bool QJsonTreeModel::loadJson(QIODevice &dev)
-{
-  return loadJson(dev.readAll());
-}
-
-bool QJsonTreeModel::loadJson(const QByteArray &buf)
-{
-  if (buf.isEmpty())
-  {
-    setNotFoundInvalidOrEmptyError("loadJson","buf");
-    return false;
-  }
-
-  // parse
-  bool ok;
-  QVariantMap map = m_parser->parse(buf,&ok).toMap();
-  if (!ok)
-  {
-      m_error = tr("loadJson: JSON parser error: line %1, %2").arg(QVariant(m_parser->errorLine()).toString()).arg(m_parser->errorString());
-      return false;
-  }
-
-  return loadJson(map);
-}
-
-bool QJsonTreeModel::loadJson(const QVariantMap &map)
-{
-    return buildModel(map);
-}
-
-bool QJsonTreeModel::saveJson(const QString &path, QJson::IndentMode indentmode, const QVariantMap& additional)
-{
-  QFile file(path);
-  bool b = file.open(QIODevice::WriteOnly);
-  b = saveJson(file,indentmode,additional);
-  file.close();
-  return b;
-}
-
-bool QJsonTreeModel::saveJson(QIODevice &dev, QJson::IndentMode indentmode, const QVariantMap& additional)
-{
-  QByteArray buf = saveJson(indentmode,additional);
-  if (buf.isEmpty())
-  {
-    setNotFoundInvalidOrEmptyError("saveJson","buf");
-    return false;
-  }
-  qint64 sz = dev.write(buf);
-  if (sz != buf.size())
-  {
-    m_error = tr("saveJson: error writing, requested %1, written %2, QIODevice error: %3").arg(QVariant(buf.size()).toString()).arg(QVariant(sz).toString()).arg(dev.errorString());
-    return false;
-  }
-  return true;
-}
-
-QByteArray QJsonTreeModel::saveJson(QJson::IndentMode indentmode, const QVariantMap& additional)
-{
-  m_serializer->setIndentMode(indentmode);
-  QVariantMap m = m_root->child(0)->toMap();
-  foreach (QString key, additional.keys())
-  {
-      m[key]=additional[key];
-  }
-
-  return m_serializer->serialize(m);
-}
-
-void QJsonTreeModel::setNotFoundInvalidOrEmptyError(const QString &function, const QString &val)
-{
-  m_error=tr("%1: ERROR not found, empty or invalid:\n%2").arg(function).arg(val);
-}
-
-int QJsonTreeModel::jsonVersion(const QVariantMap map) const
-{
-    int v = map.value("version",-1).toInt();
-    if (v == -1)
-        return -1;
-
-    return v;
-}
 
 QJsonTreeItem *QJsonTreeModel::parentItem(const QModelIndex &parent) const
 {
@@ -222,15 +62,15 @@ QModelIndex QJsonTreeModel::index(int row, int column, const QModelIndex &parent
 
   // check various item options
   QVariantMap m = child->map();
-  QString tag = child->headerTagByIdx(column);
-  if (m.keys().contains("__hasROSet__") && (m_specialFlags & QJsonTreeItem::ReadOnlyHidesRow) && (m_specialFlags & QJsonTreeItem::HonorHide))
+  QString tag = child->headerTagByIdx(column);  
+  bool b = m.value("__hasROSet__",false).toBool();
+  if (b && (m_specialFlags & QJsonTreeItem::ReadOnlyHidesRow) && (m_specialFlags & QJsonTreeItem::HonorHide))
   {
     // hides the whole row
-    if (m["__hasROSet__"].toBool() == true)
       return QModelIndex();
   }
 
-  bool b = m.value("_template_",false).toBool();
+  b = m.value("_template_",false).toBool();
   if (b)
   {
     // always hide templates
@@ -243,15 +83,13 @@ QModelIndex QJsonTreeModel::index(int row, int column, const QModelIndex &parent
     // hide the whole row
     return QModelIndex();
   }
-
   b = m.value("_hide_:" % tag,false).toBool();
   if (b && (m_specialFlags & QJsonTreeItem::HonorHide))
   {
     // hide only this value
     return QModelIndex();
   }
-
-  return createIndex(row, column, child);
+  return createIndex (row, column, child);
 }
 
 QModelIndex QJsonTreeModel::parent(const QModelIndex &index) const
@@ -269,7 +107,7 @@ QModelIndex QJsonTreeModel::parent(const QModelIndex &index) const
    if (parent == m_root)
      return QModelIndex();
 
-   return createIndex(parent->row(), 0, parent);
+   return createIndex (parent->row(), 0, parent);
 }
 
 int QJsonTreeModel::columnCount(const QModelIndex &parent) const
@@ -378,7 +216,7 @@ bool QJsonTreeModel::insertRows(int row, int count, const QModelIndex &parent)
   beginInsertRows(parent,row,row+count-1);
   for (int i = 0; i < count; i++)
   {
-    QJsonTreeItem* newitem = new QJsonTreeItem(parentit);
+    QJsonTreeItem* newitem = new QJsonTreeItem(parentit->widget(),parentit);
     parentit->appendChild(newitem);
   }
   endInsertRows();
@@ -413,32 +251,6 @@ int QJsonTreeModel::rowCount(const QModelIndex &parent) const
   return item->childCount();
 }
 
-bool QJsonTreeModel::canFetchMore(const QModelIndex &parent) const
-{
-  QJsonTreeItem* item = itemByModelIndex(parent);
-  if (!item)
-    return false;
-
-  // will call fetchmore only if the item has no fetched children
-  if (item->fetchedChildren() == item->childCount())
-    return false;
-  return true;
-}
-
-void QJsonTreeModel::fetchMore(const QModelIndex &parent)
-{
-  QJsonTreeItem* item = itemByModelIndex(parent);
-  if (!item)
-    return;
-  int tofetch = qMin(m_maxRows,item->childCount() - item->fetchedChildren());
-  if (tofetch == 0)
-      return;
-
-  beginInsertRows(parent,0,tofetch+1);
-  item->setFetchedChildren(item->fetchedChildren()+tofetch);
-  endInsertRows();
-}
-
 void QJsonTreeModel::clear()
 {
   beginResetModel();
@@ -447,9 +259,6 @@ void QJsonTreeModel::clear()
     delete m_root;
     m_root = 0;
   }
-  m_error.clear();
-  m_maxRows = MAX_ROWS_FOR_FETCH;
-  m_maxVersion = JSON_TREE_MAX_VERSION;
   m_specialFlags = (QJsonTreeItem::HonorReadOnly | QJsonTreeItem::HonorHide);
   endResetModel();
 }
@@ -482,7 +291,7 @@ QVariantMap QJsonTreeModel::mapByModelIndex(const QModelIndex &index, QJsonTreeI
     *item = it;
 
   // get item map
-    return it->map();
+  return it->map();
 }
 
 const QString QJsonTreeModel::tagByModelIndex (const QModelIndex &index, QJsonTreeItem** item, int role) const
@@ -495,4 +304,15 @@ const QString QJsonTreeModel::tagByModelIndex (const QModelIndex &index, QJsonTr
   if (item)
     *item = it;
   return it->headerTagByIdx(index.column());
+}
+
+const QModelIndex QJsonTreeModel::indexByItem(QJsonTreeItem* item, int column) const
+{
+  if (item == m_root)
+    return QModelIndex();
+  QJsonTreeItem* par = item->parent();
+  if (!par)
+    par = m_root;
+  int row = par->children().lastIndexOf(item);
+  return createIndex (row,column,item);
 }

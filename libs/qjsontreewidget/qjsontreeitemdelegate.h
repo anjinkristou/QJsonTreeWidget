@@ -23,6 +23,9 @@
 #include <QtCore>
 #include <QtGui>
 #include "qjsontreemodel.h"
+#include "qjsonsortfilterproxymodel.h"
+
+class QJsonTreeWidget;
 
 /**
  * @brief class to display/edit data using the QJsonTreeModel model class
@@ -30,16 +33,24 @@
  */
 class QJsonTreeItemDelegate : public QStyledItemDelegate
 {
+  friend class QJsonTreeModel;
+
   Q_OBJECT
 public:  
   /**
    * @brief constructor
    *
-   * @param parent the parent object
+   * @param proxy the proxy model used for sorting/filtering
    */
   explicit QJsonTreeItemDelegate(QObject *parent = 0);
 
-    /**
+  /**
+   * @brief destructor
+   *
+   */
+  ~QJsonTreeItemDelegate();
+
+   /**
      * @brief implementation of createEditor() from QAbstractItemDelegate interface
      *
      * @param parent the parent widget
@@ -83,6 +94,7 @@ public:
      */
     void	updateEditorGeometry ( QWidget * editor, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
+protected:
     /**
      * @brief implementation of editorEvent() from QAbstractItemDelegate interface
      *
@@ -101,12 +113,12 @@ private:
     QList<QJsonTreeItem *> templatesByItem(QJsonTreeItem *item) const;
     QJsonTreeItem* templateByName(QJsonTreeItem *item, const QString &name) const;
     int countParentChildsByName(QJsonTreeItem *item, const QString &name) const;
-    void handleLeftMousePress(QAbstractItemModel *model, const QModelIndex &index);
-    void handleRightMousePress(QMouseEvent *event, QAbstractItemModel *model, const QModelIndex &index);
+    void handleLeftMousePress(const QModelIndex &index);
+    void handleRightMousePress(QMouseEvent *event, const QModelIndex &index);
     void drawButton(const QStyleOptionViewItem &option, QPainter *painter, const QStyle::ControlElement type, const QString &text=QString(), const QString& pixmap=QString(), bool checked=false) const;
     QHash<QString,QStyle::ControlElement> m_widgetTypes;
     void buildWidgetTypes();
-    void execMenu(QJsonTreeModel *model, const QModelIndex &index, QJsonTreeItem *item, QMenu *menu, const QPoint &pos) const;
+    void execMenu(const QModelIndex &index, QJsonTreeItem *item, QMenu *menu, const QPoint &pos) const;
 };
 
 #endif // QJSONTREEITEMDELEGATE_H

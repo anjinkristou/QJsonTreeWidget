@@ -1,9 +1,6 @@
 QJsonTreeWidget is a QT library which eases the displaying and editing of JSON structured trees.
 think of your application configuration data, or generally any other kind of data you need to display using a tree.
 
-Internally it's optimized for performance of displaying large trees too, using its own model which fetches 
-data on-demand only.
-
 Usage is really simple, you just have to adopt this format for your tree:
 
 . each line of the JSON file should represent a leaf in your tree (this eases maintenance by hand, but really 

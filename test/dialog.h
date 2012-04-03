@@ -32,6 +32,8 @@ namespace Ui {
    void on_loadPushButton_clicked();
 
    void onTreeButtonClicked(const QJsonTreeItem* item, const QString& jsontag);
+   void on_enableSortingCheckBox_toggled(bool checked);
+   void on_searchButton_clicked();
  };
 
 #endif // DIALOG_H

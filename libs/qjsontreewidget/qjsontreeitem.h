@@ -22,6 +22,11 @@
 
 #include <QtCore>
 
+class QJsonTreeModel;
+class QJsonTreeWidget;
+class QTreeView;
+class QJsonSortFilterProxyModel;
+
 /**
  * @brief class to represent a tree item from a JSON object coming from QJsonTreeModel
  *
@@ -29,8 +34,10 @@
  class QJsonTreeItem
  {
    friend class QJsonTreeModel;
+   friend class QJsonTreeWidget;
+   friend class QJsonSortFilterProxyModel;
 
-  public:
+   public:
 
    /**
     * @brief  internal errors returned when building a QJsonTreeItem
@@ -56,13 +63,14 @@
 /**
   * @brief constructor
   *
+  * @param tree : the QJsonTreeWidget this item belongs to
   * @param parent : the item parent (optional)
   * @param map: the item data as a map coming from QJson (optional)
   */
-   QJsonTreeItem (QJsonTreeItem *parent = 0, const QVariantMap &map = QVariantMap());
+   QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent = 0, const QVariantMap &map = QVariantMap());
 
    /**
-    * @brief fills an item from a QJson map. This destroys the previous item content.
+    * @brief fills an item from a QJson map, replacing previous content
     *
     * @param map: the item data as a map coming from QJson
     * @param parent : the item parent (optional)
@@ -89,7 +97,7 @@
     * @param row the row number
     * @return QJsonTreeItem
     */
-   QJsonTreeItem* child(int row) const { return m_childItems.value(row); }
+   QJsonTreeItem* child(int row) const { return m_children.value(row); }
 
    /**
     * @brief removes the specified child from the internal list. the corresponding QJsonTreeItem* is deleted too.
@@ -103,21 +111,21 @@
     *
     * @return QList<QJsonTreeItem *>
     */
-   QList<QJsonTreeItem*> children() const { return m_childItems; }
+   QList<QJsonTreeItem*> children() const { return m_children; }
 
    /**
     * @brief returns whether this item has children or not
     *
     * @return bool
     */
-   bool hasChildren() const { return !m_childItems.isEmpty(); }
+   bool hasChildren() const { return !m_children.isEmpty(); }
 
    /**
     * @brief returns the number of childs this item has (= the number of rows for the parent item)
     *
     * @return int
     */
-   int childCount() const { return m_childItems.count(); }
+   int childCount() const { return m_children.count(); }
 
    /**
     * @brief returns the number of childs (recursive) this item has
@@ -131,7 +139,7 @@
     *
     * return int
     */
-   int totalTreeItems() const { return m_rootItem->m_totalTreeItems; }
+   int totalTreeItems() const { return m_root->m_totalTreeItems; }
 
    /**
     * @brief returns the number of tree columns this item is represented on (fixed, from JSON root map "_headers_" stored in the root item's columns descriptor)
@@ -208,21 +216,21 @@
     *
     * @return QJsonTreeItem
     */
-   QJsonTreeItem* parent() const { return m_parentItem; }
+   QJsonTreeItem* parent() const { return m_parent; }
 
    /**
     * @brief returns whether this item has parent or not (if not, this is the root item)
     *
     * @return bool
     */
-   bool hasParent() const { return (m_parentItem == 0 ? false : true); }
+   bool hasParent() const { return (m_parent == 0 ? false : true); }
 
    /**
     * @brief returns the tree root item
     *
     * @return QJsonTreeItem
     */
-   QJsonTreeItem* rootItem() const { return m_rootItem; }
+   QJsonTreeItem* rootItem() const { return m_root; }
 
    /**
     * @brief returns wether the item has been constructed succesfully or not
@@ -327,28 +335,40 @@
    const QHash<QString, QVariant> headerHashByName (const QString& name) const { return m_headers.value(name,QHash<QString,QVariant>()); }
 
    /**
-    * @brief hash with mappings between QWidget types supported by the library and the flags to be applied by the view (editable, checkable, ...)
+    * @brief returns the QJsonTreeWidget this item belongs to
     *
+    * @return QJsonTreeWidget
     */
-   static QHash<QString, Qt::ItemFlags> widgetFlags;
+   QJsonTreeWidget* widget() const { return m_widget; }
 
- private:
+   /**
+    * @brief returns the text at the specified column
+    *
+    * @param idx the column index
+    * @return QString
+    */
+   QString text(int column) const;
+
+ protected:
+   static void buildWidgetFlags();
+   QJsonTreeModel* model();
+   QTreeView *view();
+   static QHash<QString, Qt::ItemFlags> widgetFlags;
    bool setColumnHeaders(const QString &headers);
    const QString headerNameOrTagByString(const QString &name, bool returntag, int *column) const;
    const QString headerNameOrTagByInt(int column, bool returntag) const;
-   static void buildWidgetFlags();
-   int fetchedChildren() { return m_fetchedChildren; }
-   void setFetchedChildren(int fetched) { m_fetchedChildren = fetched; }
 
+ private:
    QJsonTreeItem::JsonMapErrors m_error;
-   QList<QJsonTreeItem*> m_childItems;
+   QModelIndex m_index;
+   QList<QJsonTreeItem*> m_children;
    QVariantMap m_map;
    QVariantMap m_invalidMap;
-   QJsonTreeItem* m_parentItem;
-   QJsonTreeItem* m_rootItem;
+   QJsonTreeItem* m_parent;
+   QJsonTreeItem* m_root;
+   QJsonTreeWidget* m_widget;
    int m_headersCount; // m_headers.count() to return number of columns wouldnt work, since how we store data in such hash
    int m_totalTreeItems;
-   int m_fetchedChildren;
 
    QHash<QString, QHash<QString, QVariant> > m_headers;
  };

@@ -18,13 +18,18 @@
  */
 
 #include "qjsontreeitem.h"
+#include "qjsontreewidget.h"
 
 QHash<QString,Qt::ItemFlags> QJsonTreeItem::widgetFlags;
 
-QJsonTreeItem::QJsonTreeItem (QJsonTreeItem *parent, const QVariantMap &map)
+QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, const QVariantMap &map)
 {
-  this->clear();
-  m_parentItem = parent;
+  m_headersCount = 0;
+  m_widget = 0;
+  m_error = QJsonTreeItem::JsonNoError;
+  m_parent = parent;
+  m_widget = tree;
+  m_map = map;
 
   // this is done only once
   if (QJsonTreeItem::widgetFlags.isEmpty())
@@ -40,14 +45,12 @@ QJsonTreeItem::QJsonTreeItem (QJsonTreeItem *parent, const QVariantMap &map)
 
 bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
 {
-  this->clear();
-
-  m_parentItem = parent;
+  m_parent = parent;
   m_map = map;
 
   if (parent == 0)
   {
-    m_rootItem = this;
+    m_root = this;
 
     // this is the root item, must have "_headers_" set, store headers descriptor in m_headers
     if (!setColumnHeaders(map.value("_headers_",QString()).toString()))
@@ -56,29 +59,19 @@ bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
       m_invalidMap = m_map;
 
       // this invalidates the root map too
-      m_rootItem->m_error = m_error;
-      m_rootItem->m_invalidMap = m_invalidMap;
+      m_root->m_error = m_error;
+      m_root->m_invalidMap = m_invalidMap;
       return false;
     }
   }
   else
   {
-    m_headers = static_cast<QHash<QString, QHash<QString, QVariant> > >(parent->m_headers); // always points to parent
-    m_rootItem = parent->rootItem();
+    m_headers = parent->headers();
+    m_root = parent->rootItem();
+    m_headersCount = parent->columnCount();
+    m_totalTreeItems = parent->totalTreeItems();
   }
 
-  /*// name is mandatory (except in the invisible root item)
-  if (!m_map.contains("name") && (m_rootItem != this))
-  {
-    m_error = QJsonTreeItem::JsonInvalidMap;
-    m_invalidMap = m_map;
-
-    // this invalidates the root map too
-    m_rootItem->m_error = m_error;
-    m_rootItem->m_invalidMap = m_invalidMap;
-    return false;
-  }
-  */
   // this is to optimize model index() function
   foreach (QString k, m_map.keys())
   {
@@ -96,7 +89,7 @@ bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
     foreach (QVariant mm, l)
     {
       // recurse
-      QJsonTreeItem* i = new QJsonTreeItem(this,mm.toMap());
+      QJsonTreeItem* i = new QJsonTreeItem(this->widget(),this,mm.toMap());
       this->appendChild(i);
     }
   }
@@ -110,27 +103,28 @@ bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
 
 QJsonTreeItem::~QJsonTreeItem()
 {
+  qDebug() << "~QJsonTreeItem()";
   this->clear();
 }
 
 void QJsonTreeItem::appendChild(QJsonTreeItem *child)
 {
-  m_childItems.append(child);
-  m_rootItem->m_totalTreeItems++;
+  m_children.append(child);
+  m_root->m_totalTreeItems++;
 }
 
 void QJsonTreeItem::removeChild(int row)
 {
   QJsonTreeItem* it = this->child(row);
-  m_childItems.removeAt(row);
+  m_children.removeAt(row);
   delete it;
-  m_rootItem->m_totalTreeItems--;
+  m_root->m_totalTreeItems--;
 }
 
 int QJsonTreeItem::totalChildCount() const
 {
   int rowabs = this->rowAbsolute();
-  return (m_rootItem->m_totalTreeItems - rowabs);
+  return (m_root->m_totalTreeItems - rowabs);
 }
 
 bool QJsonTreeItem::setColumnHeaders (const QString& columns)
@@ -236,6 +230,12 @@ int QJsonTreeItem::headerIdxByName(const QString &name) const
   return headerIdxByTag(name); // since we have the name too as key in the parent hash, this will work
 }
 
+QString QJsonTreeItem::text(int column) const
+{
+  QString tag = headerTagByIdx(column);
+  return m_map.value(tag,QString()).toString();
+}
+
 int QJsonTreeItem::row() const
 {
   // if there's a parent item, this item's corresponding row is taken from the childs index of its parent. either, its the 1st row (row 0, this is a parent item)
@@ -267,15 +267,8 @@ int QJsonTreeItem::rowAbsolute() const
 
 void QJsonTreeItem::clear()
 {
-  m_headers.clear();
-  m_totalTreeItems = 0;
-  m_headersCount = 0;
-  m_parentItem = 0;
-  m_fetchedChildren = false;
-  m_error = QJsonTreeItem::JsonNoError;
-  m_map.clear();
-  qDeleteAll(m_childItems);
-  m_childItems.clear();
+  qDeleteAll(m_children);
+  m_children.clear();
 }
 
 void QJsonTreeItem::buildWidgetFlags()
@@ -329,4 +322,14 @@ const QVariantMap QJsonTreeItem::toMap(int depth, QVariantMap intmap, QJsonTreeI
   }
 
   return intmap;
+}
+
+QJsonTreeModel* QJsonTreeItem::model()
+{
+  return m_widget->model();
+}
+
+QTreeView* QJsonTreeItem::view()
+{
+  return m_widget->view();
 }

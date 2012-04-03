@@ -22,12 +22,8 @@
 
 #include <QtCore>
 #include "qjsontreeitem.h"
-#include <QJson/Serializer>
-#include <QJson/Parser>
-#include <QJson/QObjectHelper>
 
-#define JSON_TREE_MAX_VERSION 3 // maximum supported JSON version by the library
-#define MAX_ROWS_FOR_FETCH 100 // fetch this number of rows per time (for bigger trees)
+class QJsonTreeItemDelegate;
 
 /**
  * @brief class to model a tree from a JSON file/buffer coming from QJson
@@ -35,14 +31,20 @@
  */
 class QJsonTreeModel : public QAbstractItemModel
 {
+  friend class QJsonTreeItem;
+  friend class QJsonTreeWidget;
+  friend class QJsonTreeItemDelegate;
+  friend class QJsonSortFilterProxyModel;
+
   Q_OBJECT
 public:
   /**
    * @brief constructor
    *
+   * @param root the root item
    * @param parent the parent object (optional)
    */
-  explicit QJsonTreeModel(QObject *parent = 0);
+  explicit QJsonTreeModel(QJsonTreeItem* root, QObject *parent = 0);
 
   /**
    * @brief destructor
@@ -57,89 +59,6 @@ public:
    * @return QJsonTreeItem
    */
   QJsonTreeItem* root() const { return m_root; }
-
-  /**
-   * @brief returns detailed error
-   *
-   * @return const QString
-   */
-  const QString error() const { return m_error; }
-
-  /**
-   * @brief
-   *
-   * @param path path to the JSON file
-   * @return bool false on parser error, look at error() for detailed error string
-   */
-  bool loadJson(const QString& path);
-
-  /**
-   * @brief
-   *
-   * @param dev a QIODevice (i.e. QFile) to read the JSON from
-   * @return bool false on parser error, look at error() for detailed error string
-   */
-  bool loadJson (QIODevice& dev);
-
-  /**
-   * @brief
-   *
-   * @param buf a QByteArray containing the JSON buffer
-   * @return bool false on parser error, look at error() for detailed error string
-   */
-  bool loadJson (const QByteArray& buf);
-
-  /**
-   * @brief
-   *
-   * @param buf a QVariant map
-   * @return bool false if the map do not contain valid data for QJsonTreeWidget, look at error() for detailed error string
-   */
-  bool loadJson (const QVariantMap& map);
-
-  /**
-   * @brief serializes the tree to a JSON file
-   *
-   * @param path path to the JSON file to be saved
-   * @param indentmode one of the indentation mode defined in QJson::IndentMode
-   * @param additional an optional additional map to be added
-   * @return bool
-   */
-  bool saveJson(const QString& path, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
-
-  /**
-   * @brief serializes the tree to a QIODevice file
-   *
-   * @param dev a QIODevice (i.e. QFile)
-   * @param indentmode one of the indentation mode defined in QJson::IndentMode
-   * @param additional an optional additional map to be added
-   * @return bool
-   */
-  bool saveJson (QIODevice& dev, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
-
-  /**
-   * @brief serializes the tree to a JSON buffer
-   *
-   * @param indentmode one of the indentation mode defined in QJson::IndentMode
-   * @param additional an optional additional map to be added
-   * @return QByteArray
-   */
-  QByteArray saveJson (QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
-
-  /**
-   * @brief returns the version of JSON map to be represented (tag "version" in the map)
-   *
-   * @param map the JSON map
-   * @return int
-   */
-  int jsonVersion(const QVariantMap map) const;
-
-  /**
-   * @brief returns the maximum supported JSON tree version by the library
-   *
-   * @return int
-   */
-  int maxSupportedJsonVersion() const { return m_maxVersion; }
 
   /**
    * @brief implementation of index() from the QAbstractItemModel interface
@@ -259,40 +178,10 @@ public:
   bool hasChildren ( const QModelIndex & parent = QModelIndex() );
 
   /**
-   * @brief implementation of canFetchMore() from the QAbstractItemModel interface
-   *
-   * @param parent the parent index (optional)
-   * @return bool
-   */
-  bool canFetchMore(const QModelIndex &parent) const;
-
-  /**
-   * @brief implementation of fetchMore() from the QAbstractItemModel interface
-   *
-   * @param parent the parent index
-   * @return bool
-   */
-  void fetchMore(const QModelIndex &parent);
-
-  /**
    * @brief clears the model by calling reset and deleting the tree
    *
    */
   void clear();
-
-  /**
-   * @brief sets the model special flags to control how the view how to displays the items
-   *
-   * @param QJsonTreeItem::SpecialFlag one or more special flags
-   */
-  void setSpecialFlags(QJsonTreeItem::SpecialFlags flags);
-
-  /**
-   * @brief returns the current value of special flags
-   *
-   * @return QJsonTreeItem::SpecialFlags
-   */
-  QJsonTreeItem::SpecialFlags specialFlags() const { return m_specialFlags; }
 
   /**
    * @brief returns the tree item corresponding to the model index
@@ -324,30 +213,22 @@ public:
   QVariantMap mapByModelIndex (const QModelIndex& index, QJsonTreeItem** item=0,int role = Qt::DisplayRole) const;
 
   /**
-   * @brief returns the QJSON serializer
+   * @brief returns the modelindex corresponding to a tree item
    *
-   * return QJson::Serializer
+   * @param item the QJsonTreeWidget item
+   * @param column the column
+   * return const QModelIndex
    */
-  QJson::Serializer* serializer() const { return m_serializer; }
+  const QModelIndex indexByItem(QJsonTreeItem *item, int column) const;
 
-  /**
-   * @brief returns the QJSON parser
-   *
-   * return QJson::Parser
-   */
-  QJson::Parser* parser() const { return m_parser; }
+protected:
+  void setSpecialFlags(QJsonTreeItem::SpecialFlags flags);
+  QJsonTreeItem::SpecialFlags specialFlags() const { return m_specialFlags; }
 
-  private:
-  bool buildModel(const QVariantMap& map);
-  void setNotFoundInvalidOrEmptyError(const QString& function,const QString& val);
+ private:
   QJsonTreeItem* parentItem(const QModelIndex& parent) const;
   QJsonTreeItem* m_root;
-  QJson::Parser* m_parser;
-  QJson::Serializer* m_serializer;
-  QString m_error;
   QJsonTreeItem::SpecialFlags m_specialFlags;
-  int m_maxVersion;
-  int m_maxRows;
 };
 
 #endif // QJSONTREEMODEL_H

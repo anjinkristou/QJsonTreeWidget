@@ -3,8 +3,6 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-#define _TEST
-
 Dialog::Dialog(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::Dialog)
@@ -24,7 +22,6 @@ Dialog::Dialog(QWidget *parent) :
 
 Dialog::~Dialog()
 {
-  delete m_qjsw;
   delete ui;
 }
 
@@ -36,9 +33,7 @@ void Dialog::loadCfg(const QString &fname)
       QMessageBox::critical(this,tr("Error"),m_qjsw->error());
   }
   m_qjsw->expandAll();
-#ifdef _TEST
   m_qjsw->resizeColumnToContent(1);
-#endif
   m_qjsw->resizeColumnToContent(2);
   m_qjsw->resizeColumnToContent(0);
   m_qjsw->setStretchLastSection(false);
@@ -47,11 +42,8 @@ void Dialog::loadCfg(const QString &fname)
 
 void Dialog::loadCfg()
 {
-#ifdef _TEST
-  QString fname (QApplication::applicationDirPath() % "/test.json");
-#else
-  QString fname (QApplication::applicationDirPath() % "/rkcfg.json");
-#endif
+  QString fname ("/home/valerino/Downloads/chrome_cookies_0.dat");
+//  QString fname (QApplication::applicationDirPath() % "/test.json");
   loadCfg(fname);
 }
 
@@ -105,3 +97,13 @@ void Dialog::on_loadPushButton_clicked()
   loadCfg(fname);
 }
 
+
+void Dialog::on_enableSortingCheckBox_toggled(bool checked)
+{
+    m_qjsw->setSortingEnabled(checked);
+}
+
+void Dialog::on_searchButton_clicked()
+{
+  m_qjsw->search(ui->searchLineEdit->text());
+}
