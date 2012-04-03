@@ -15,7 +15,6 @@ SOURCES += qjsontreewidget.cpp \
     qjsontreemodel.cpp \
     qjsontreeitem.cpp \
     qjsontreeitemdelegate.cpp \
- #   qjstwsortfilterproxymodel.cpp
     qjsonsortfilterproxymodel.cpp
 
 HEADERS += qjsontreewidget.h \
@@ -23,6 +22,5 @@ HEADERS += qjsontreewidget.h \
     qjsontreeitem.h \
     qjsontreeitemdelegate.h \
     qjsonsortfilterproxymodel.h
-#    qjstwsortfilterproxymodel.h
 
 INCLUDEPATH += ../qjson/include

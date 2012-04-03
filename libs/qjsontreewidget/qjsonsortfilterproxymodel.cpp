@@ -46,7 +46,6 @@ bool QJsonSortFilterProxyModel::filterAcceptsRow ( int source_row, const QModelI
   if (this->filterRegExp().isEmpty())
     return true;
   int cols = item->columnCount();
-  bool select = false;
   for (int i=0; i < cols; i++)
   {
     // select ?
