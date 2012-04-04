@@ -25,6 +25,7 @@
 #include <QJson/Serializer>
 #include <QJson/Parser>
 #include <QJson/QObjectHelper>
+#include "qjsontree_global.h"
 #include "qjsontreemodel.h"
 #include "qjsontreeitemdelegate.h"
 #include "qjsonsortfilterproxymodel.h"
@@ -36,7 +37,7 @@
   * the format used to define the tree as a JSON is outlined here: https://www.te4i.com/confluence/display/H21/Configuration+JSON+format+%28rkmodv2%29
   *
   */
- class QJsonTreeWidget : public QWidget{
+ class QJSONTREE_EXPORT QJsonTreeWidget : public QWidget{
  Q_OBJECT
  public:
 

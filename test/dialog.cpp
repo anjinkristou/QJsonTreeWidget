@@ -42,8 +42,7 @@ void Dialog::loadCfg(const QString &fname)
 
 void Dialog::loadCfg()
 {
-  QString fname ("/home/valerino/Downloads/chrome_cookies_0.dat");
-//  QString fname (QApplication::applicationDirPath() % "/test.json");
+  QString fname (QApplication::applicationDirPath() % "/test.json");
   loadCfg(fname);
 }
 
