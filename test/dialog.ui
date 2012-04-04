@@ -42,13 +42,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="enableSortingCheckBox">
-     <property name="text">
-      <string>Enable sorting</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
@@ -74,13 +67,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="loadPushButton">
-     <property name="text">
-      <string>load</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QPushButton" name="reloadPushButton">
      <property name="text">
       <string>reload</string>
@@ -91,13 +77,6 @@
     <widget class="QPushButton" name="clearPushButton">
      <property name="text">
       <string>clear</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="savePushButton">
-     <property name="text">
-      <string>save</string>
      </property>
     </widget>
    </item>

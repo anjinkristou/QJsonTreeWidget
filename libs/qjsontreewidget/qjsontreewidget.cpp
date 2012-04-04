@@ -36,6 +36,7 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   QBoxLayout* l= new QVBoxLayout(this);
   m_view = new QTreeView(this);
   m_view->setHeaderHidden(false);
+  m_view->setSortingEnabled(false);
   l->addWidget(m_view);
 
   // add an optional layout for the user to put its controls in
@@ -45,7 +46,21 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   // set the delegate on the view
   m_delegate = new QJsonTreeItemDelegate(this);
   m_view->setItemDelegate(m_delegate);
+
+  // add actions reachable by rightclicking on header
   m_view->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_actionEnableSort = new QAction(tr("Enable sorting"),m_view);
+  m_actionDisableSort = new QAction(tr("Disable sorting"),m_view);
+  m_actionLoad = new QAction(tr("Load from file"),m_view);
+  m_actionSave = new QAction(tr("Save to file"),m_view);
+  connect (m_actionLoad,SIGNAL(triggered()),this,SLOT(onActionLoad()));
+  connect (m_actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
+  connect (m_actionEnableSort,SIGNAL(triggered()),this,SLOT(onActionEnableSort()));
+  connect (m_actionDisableSort,SIGNAL(triggered()),this,SLOT(onActionDisableSort()));
+  m_actionLoad->setVisible(false);
+  m_actionDisableSort->setVisible(false);
+  m_view->header()->addActions(QList<QAction*>() << m_actionEnableSort << m_actionDisableSort << m_actionLoad << m_actionSave);
+  m_view->header()->setContextMenuPolicy(Qt::ActionsContextMenu);
 
   // to update the model on edits
   connect (m_model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(onDataChanged(QModelIndex,QModelIndex)));
@@ -223,6 +238,8 @@ void QJsonTreeWidget::keyPressEvent(QKeyEvent *event)
 
 bool QJsonTreeWidget::loadJsonInternal(const QVariantMap& map)
 {
+  this->clear();
+
   if (map.isEmpty())
   {
       setNotFoundInvalidOrEmptyError("loadJsonInternal","map");
@@ -300,11 +317,22 @@ void QJsonTreeWidget::setSortingEnabled(bool enable)
 {
   m_view->setSortingEnabled(enable);
   if (!enable)
+  {
+    m_actionEnableSort->setVisible(true);
+    m_actionDisableSort->setVisible(false);
     m_proxyModel->sort(-1);
+  }
+  else
+  {
+    // sorting enabled
+    m_actionEnableSort->setVisible(false);
+    m_actionDisableSort->setVisible(true);
+  }
 }
 
 void QJsonTreeWidget::search(const QString& text)
 {
+  this->expandAll();
   m_proxyModel->setFilterRegExp(QRegExp(text,Qt::CaseInsensitive,QRegExp::FixedString));
   searchInternal();
 }
@@ -321,4 +349,34 @@ void QJsonTreeWidget::searchInternal()
   m_proxyModel->setFilterKeyColumn(-1);
   this->setFocus();
   this->nextSelection();
+}
+
+void QJsonTreeWidget::onActionLoad()
+{
+  QString fname = QFileDialog::getOpenFileName(this, tr("Load JSON"),QString(),tr("JSON Files (*.json)"));
+  if (!fname.isEmpty())
+  {
+    loadJson(fname);
+    this->expandAll();
+    this->resizeColumnToContent(0);
+  }
+}
+
+void QJsonTreeWidget::onActionSave()
+{
+  QString fname = QFileDialog::getSaveFileName(this, tr("Save JSON"),QString(),tr("JSON Files (*.json)"));
+  if (!fname.isEmpty())
+  {
+    saveJson(fname,QJson::IndentMinimum);
+  }
+}
+
+void QJsonTreeWidget::onActionEnableSort()
+{
+  setSortingEnabled(true);
+}
+
+void QJsonTreeWidget::onActionDisableSort()
+{
+  setSortingEnabled(false);
 }

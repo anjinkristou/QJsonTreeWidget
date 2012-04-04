@@ -26,13 +26,10 @@ namespace Ui {
    void on_honorReadOnlyCheckBox_toggled(bool checked);
    void on_honorHideCheckBox_toggled(bool checked);
    void on_treatROAsHideCheckBox_toggled(bool checked);
-   void on_savePushButton_clicked();
    void on_clearPushButton_clicked();
    void on_reloadPushButton_clicked();
-   void on_loadPushButton_clicked();
 
    void onTreeButtonClicked(const QJsonTreeItem* item, const QString& jsontag);
-   void on_enableSortingCheckBox_toggled(bool checked);
    void on_searchButton_clicked();
  };
 

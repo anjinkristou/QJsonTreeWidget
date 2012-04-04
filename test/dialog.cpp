@@ -37,6 +37,8 @@ void Dialog::loadCfg(const QString &fname)
   m_qjsw->resizeColumnToContent(2);
   m_qjsw->resizeColumnToContent(0);
   m_qjsw->setStretchLastSection(false);
+  m_qjsw->setLoadFromFileEnabled(true);
+  m_qjsw->setSortingEnabled(true);
   m_lastLoaded = fname;
 }
 
@@ -64,15 +66,6 @@ void Dialog::on_treatROAsHideCheckBox_toggled(bool checked)
     (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::ReadOnlyHidesRow));
 }
 
-void Dialog::on_savePushButton_clicked()
-{
-  // always save to appdir/output.json
-  QString fname (QApplication::applicationDirPath() % "/output.json");
-  m_qjsw->saveJson(fname,QJson::IndentMinimum);
-  QFileInfo fi (fname);
-  QDesktopServices::openUrl(fi.path());
-}
-
 void Dialog::on_clearPushButton_clicked()
 {
     m_qjsw->clear();
@@ -86,20 +79,6 @@ void Dialog::on_reloadPushButton_clicked()
 void Dialog::onTreeButtonClicked(const QJsonTreeItem *item, const QString& jsontag)
 {
   QMessageBox::information(this,"clicked",jsontag);
-}
-
-void Dialog::on_loadPushButton_clicked()
-{
-  QString fname = QFileDialog::getOpenFileName(this, tr("Select configuration"), QString(), tr("JSON files (*.*)"));
-  if (fname.isEmpty())
-    return;
-  loadCfg(fname);
-}
-
-
-void Dialog::on_enableSortingCheckBox_toggled(bool checked)
-{
-    m_qjsw->setSortingEnabled(checked);
 }
 
 void Dialog::on_searchButton_clicked()

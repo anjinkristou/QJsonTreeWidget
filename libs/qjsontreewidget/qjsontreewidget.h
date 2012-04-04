@@ -177,7 +177,7 @@
     * all the displayed items by the view are children of this item. this is to be consistent with other widget-based QT api.
     * @return QJsonTreeItem
     */
-   QJsonTreeItem* invisibleRootItem() { return m_model->root(); }
+   QJsonTreeItem* invisibleRootItem() const { return m_model->root(); }
 
    /**
     * @brief clears the widget
@@ -277,6 +277,20 @@
     */
    void search(const QRegExp& regex);
 
+   /**
+    * @brief enable the right-click "load from file" option
+    *
+    * @param enable to enable load
+    */
+   void setLoadFromFileEnabled (bool enable) { m_actionLoad->setVisible(enable); }
+
+   /**
+    * @brief returns the actions set in the view's header (to add custom actions)
+    *
+    * return QList<QAction*>
+    */
+   QList<QAction*> headerActions() const { return m_view->header()->actions(); }
+
  signals:
    /**
     * @brief connect to this signal to be notified of generic mouseclicks on the view
@@ -300,6 +314,10 @@
  private slots:
    void onDataChanged (const QModelIndex & topLeft, const QModelIndex & bottomRight );
    void nextSelection();
+   void onActionLoad();
+   void onActionSave();
+   void onActionEnableSort();
+   void onActionDisableSort();
 
  protected:
    QJsonSortFilterProxyModel* proxyModel() const { return m_proxyModel; }
@@ -307,7 +325,7 @@
    QJsonTreeModel* model() const { return m_model; }
    bool loadJsonInternal(const QVariantMap &map);
    void setNotFoundInvalidOrEmptyError(const QString &function, const QString &val);
-   void keyPressEvent(QKeyEvent *event);
+   virtual void keyPressEvent(QKeyEvent *event);
 
  private:
    void searchInternal();
@@ -322,6 +340,10 @@
    QJson::Parser* m_parser;
    QJson::Serializer* m_serializer;
    QModelIndex m_currentSelection;
+   QAction* m_actionLoad;
+   QAction* m_actionSave;
+   QAction* m_actionEnableSort;
+   QAction* m_actionDisableSort;
    int m_maxVersion;
  };
 
