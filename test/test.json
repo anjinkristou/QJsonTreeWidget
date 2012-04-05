@@ -1,4 +1,4 @@
-{ "_desc_" :  "Configuration options", "name" : "Configuration", "version" : 2, "_headers_": "name:name:0,description:_desc_:1,value:value:2,value2:anothervalue:3,click:_button1_:4:draw,click2:_button2_:5:draw", "_children_" : [
+{ "_desc_" :  "Configuration options", "name" : "Configuration", "version" : 3, "_headers_": "name:name:0,description:_desc_:1,value:value:2,value2:anothervalue:3,click:_button1_:4:draw,click2:_button2_:5:draw", "_children_" : [
     { "_desc_" : "Tree sample", "name" : "tree1", "_widget_:value" : "Tree", "_children_" : [
     { "_desc_" : "String sample", "name" : "foostring", "_regexp_:value" : ".+", "value" : "abcdefghijklmnopqrstuwxyz", "_widget_:value" : "QLineEdit" },
     { "_desc_" : "Spinbox sample", "_valuemax_:value" : 200, "_valuemin_:value" : 50, "name" : "foocount", "value" : 100, "_widget_:value" : "QSpinBox" },
