@@ -325,6 +325,21 @@
     */
    bool editingEnabled() const { return m_editing; }
 
+   /**
+    * @brief to purge all descriptive tags on save. this is similar to setPurgeListOnSave, but just purges only QJsonTreeWidget descriptive tags without stripping the
+    * children of items containing the tags
+    *
+    * @param enable true to purge
+    */
+   void setPurgeDescriptiveTagsOnSave(bool enable) { m_purgeDescriptiveTags = enable; }
+
+   /**
+    * @brief returns if purge descriptive tags is enabled on the widget
+    *
+    * @return bool
+    */
+   bool purgeDescriptiveTags() const { return m_purgeDescriptiveTags; }
+
  signals:
    /**
     * @brief connect to this signal to be notified of generic mouseclicks on the view
@@ -379,6 +394,7 @@
    QAction* m_actionEnableSort;
    QAction* m_actionDisableSort;
    QHash<QString,bool> m_purgeList;
+   bool m_purgeDescriptiveTags;
    bool m_editing;
    int m_maxVersion;
  };

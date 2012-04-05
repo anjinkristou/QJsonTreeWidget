@@ -21,6 +21,7 @@
 #include "qjsontreewidget.h"
 
 QHash<QString,Qt::ItemFlags> QJsonTreeItem::widgetFlags;
+QStringList QJsonTreeItem::descriptiveTags;
 
 QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, const QVariantMap &map)
 {
@@ -34,6 +35,8 @@ QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, cons
   // this is done only once
   if (QJsonTreeItem::widgetFlags.isEmpty())
     QJsonTreeItem::buildWidgetFlags();
+  if (QJsonTreeItem::descriptiveTags.isEmpty())
+    QJsonTreeItem::buildDescriptiveTags();
 
   // just create an empty item ?
   if (map.isEmpty())
@@ -282,6 +285,22 @@ void QJsonTreeItem::buildWidgetFlags()
   QJsonTreeItem::widgetFlags["QSpinBox"]=(Qt::ItemIsEditable);
 }
 
+void QJsonTreeItem::buildDescriptiveTags()
+{
+  // populate the list with descriptive tags
+  QJsonTreeItem::descriptiveTags.append("_widget_");
+  QJsonTreeItem::descriptiveTags.append("_headers_");
+  QJsonTreeItem::descriptiveTags.append("_desc_");
+  QJsonTreeItem::descriptiveTags.append("_valuemin_");
+  QJsonTreeItem::descriptiveTags.append("_valuemax_");
+  QJsonTreeItem::descriptiveTags.append("_valuelist_");
+  QJsonTreeItem::descriptiveTags.append("_regexp_");
+  QJsonTreeItem::descriptiveTags.append("_readonly_");
+  QJsonTreeItem::descriptiveTags.append("_hide_");
+  QJsonTreeItem::descriptiveTags.append("_template_");
+  QJsonTreeItem::descriptiveTags.append("_mandatory_");
+}
+
 void QJsonTreeItem::setMapValue(int column, const QVariant &value)
 {
   QString tag = headerTagByIdx(column);
@@ -329,6 +348,23 @@ const QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int
   }
   if (returnempty)
     return QVariantMap();
+
+  // strip descriptive tags ?
+  QVariantMap newmap = intmap;
+  if (it->widget()->purgeDescriptiveTags())
+  {
+    foreach (QString k, QJsonTreeItem::descriptiveTags)
+    {
+      foreach (QString kk, intmap.keys())
+      {
+        if (kk.startsWith(k,Qt::CaseInsensitive))
+        {
+          newmap.remove(kk);
+        }
+      }
+    }
+  }
+  intmap = newmap;
 
   if (it->childCount() > 0)
   {

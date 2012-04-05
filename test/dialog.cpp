@@ -39,6 +39,11 @@ void Dialog::loadCfg(const QString &fname)
   m_qjsw->setStretchLastSection(false);
   m_qjsw->setLoadFromFileEnabled(true);
   m_qjsw->setSortingEnabled(true);
+  /*m_qjsw->setPurgeDescriptiveTagsOnSave(true);
+  QHash <QString, bool> h;
+  h["_template_"] = true;
+  m_qjsw->setPurgeListOnSave(h);
+  */
   m_lastLoaded = fname;
 }
 
@@ -78,7 +83,11 @@ void Dialog::on_reloadPushButton_clicked()
 
 void Dialog::onTreeButtonClicked(const QJsonTreeItem *item, const QString& jsontag)
 {
-  QMessageBox::information(this,"clicked",jsontag);
+  QString fname = QFileDialog::getOpenFileName(0, tr("Select path"),QString(),tr("All files (*.*)"));
+  if (!fname.isEmpty())
+  {
+    const_cast<QJsonTreeItem*>(item)->setMapValue("value",fname);
+  }
 }
 
 void Dialog::on_searchButton_clicked()

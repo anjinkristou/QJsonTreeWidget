@@ -351,15 +351,18 @@ class QJsonSortFilterProxyModel;
    QString text(int column) const;
 
  protected:
-   static void buildWidgetFlags();
    QJsonTreeModel* model();
    QTreeView *view();
    static QHash<QString, Qt::ItemFlags> widgetFlags;
+   static QStringList descriptiveTags;
    bool setColumnHeaders(const QString &headers);
    const QString headerNameOrTagByString(const QString &name, bool returntag, int *column) const;
    const QString headerNameOrTagByInt(int column, bool returntag) const;
 
  private:
+   static void buildWidgetFlags();
+   static void buildDescriptiveTags();
+
    QJsonTreeItem::JsonMapErrors m_error;
    QModelIndex m_index;
    QList<QJsonTreeItem*> m_children;

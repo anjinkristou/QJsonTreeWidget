@@ -27,6 +27,7 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   m_proxyModel = 0;
   m_currentSelection = QModelIndex();
   m_editing = true;
+  m_purgeDescriptiveTags = false;
 
   // create qjson objects
   m_parser = new QJson::Parser();
