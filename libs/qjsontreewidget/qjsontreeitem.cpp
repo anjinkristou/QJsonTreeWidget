@@ -288,7 +288,7 @@ void QJsonTreeItem::setMapValue(int column, const QVariant &value)
   setMapValue(tag,value);
 }
 
-const QVariantMap QJsonTreeItem::toMap(int depth, QVariantMap intmap, QJsonTreeItem* item) const
+const QVariantMap QJsonTreeItem::toMap(const QList<QString>& purgelist, int depth, QVariantMap intmap, QJsonTreeItem* item) const
 {
   const QJsonTreeItem* it;
   if (depth == 0)
@@ -306,6 +306,16 @@ const QVariantMap QJsonTreeItem::toMap(int depth, QVariantMap intmap, QJsonTreeI
   // this was added for optimization when building the tree
   intmap.remove("__hasROSet__");
 
+  // check items to be purged
+  if (!purgelist.isEmpty())
+  {
+    foreach (QString k, intmap.keys())
+    {
+      if (purgelist.contains(k))
+        return QVariantMap();
+    }
+  }
+
   if (it->childCount() > 0)
   {
     QVariantList l;
@@ -313,7 +323,11 @@ const QVariantMap QJsonTreeItem::toMap(int depth, QVariantMap intmap, QJsonTreeI
     {
       // recurse
       depth++;
-      l.append(i->toMap(depth,intmap,i));
+      QVariantMap mm = i->toMap(purgelist,depth,intmap,i);
+      if (!mm.isEmpty())
+      {
+          l.append(mm);
+      }
       depth--;
     }
 
@@ -323,6 +337,7 @@ const QVariantMap QJsonTreeItem::toMap(int depth, QVariantMap intmap, QJsonTreeI
 
   return intmap;
 }
+
 
 QJsonTreeModel* QJsonTreeItem::model()
 {

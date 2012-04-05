@@ -118,18 +118,18 @@ bool QJsonTreeWidget::loadJson(const QVariantMap &map)
     return loadJsonInternal(map);
 }
 
-bool QJsonTreeWidget::saveJson(const QString &path, QJson::IndentMode indentmode, const QVariantMap& additional)
+bool QJsonTreeWidget::saveJson(const QString &path, QJson::IndentMode indentmode, const QList<QString>& purgelist, const QVariantMap& additional)
 {
   QFile file(path);
   bool b = file.open(QIODevice::WriteOnly);
-  b = saveJson(file,indentmode,additional);
+  b = saveJson(file,indentmode,purgelist,additional);
   file.close();
   return b;
 }
 
-bool QJsonTreeWidget::saveJson(QIODevice &dev, QJson::IndentMode indentmode, const QVariantMap& additional)
+bool QJsonTreeWidget::saveJson(QIODevice &dev, QJson::IndentMode indentmode, const QList<QString>& purgelist, const QVariantMap& additional)
 {
-  QByteArray buf = saveJson(indentmode,additional);
+  QByteArray buf = saveJson(indentmode,purgelist,additional);
   if (buf.isEmpty())
   {
     setNotFoundInvalidOrEmptyError("saveJson","buf");
@@ -144,10 +144,10 @@ bool QJsonTreeWidget::saveJson(QIODevice &dev, QJson::IndentMode indentmode, con
   return true;
 }
 
-QByteArray QJsonTreeWidget::saveJson(QJson::IndentMode indentmode, const QVariantMap& additional)
+QByteArray QJsonTreeWidget::saveJson(QJson::IndentMode indentmode, const QList<QString>& purgelist, const QVariantMap& additional)
 {
   m_serializer->setIndentMode(indentmode);
-  QVariantMap m = m_root->child(0)->toMap();
+  QVariantMap m = m_root->child(0)->toMap(purgelist);
   foreach (QString key, additional.keys())
   {
       m[key]=additional[key];
