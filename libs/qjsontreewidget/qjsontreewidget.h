@@ -311,6 +311,20 @@
     */
    const QHash<QString,bool> purgeListOnSave () const { return m_purgeList; }
 
+   /**
+    * @brief enable editing on the widget
+    *
+    * @param enable to enable editing
+    */
+   void setEditingEnabled(bool enable) { m_editing = enable; }
+
+   /**
+    * @brief returns if editing is enabled on the widget
+    *
+    * @return bool
+    */
+   bool editingEnabled() const { return m_editing; }
+
  signals:
    /**
     * @brief connect to this signal to be notified of generic mouseclicks on the view
@@ -365,6 +379,7 @@
    QAction* m_actionEnableSort;
    QAction* m_actionDisableSort;
    QHash<QString,bool> m_purgeList;
+   bool m_editing;
    int m_maxVersion;
  };
 

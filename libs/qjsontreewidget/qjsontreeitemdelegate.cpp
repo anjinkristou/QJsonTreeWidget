@@ -43,6 +43,10 @@ QWidget *QJsonTreeItemDelegate::createEditor(QWidget *parent, const QStyleOption
   if (tag.isEmpty())
     return 0;
 
+  // check if editing is enabled on the widget
+  if (!item->widget()->editingEnabled())
+    return 0;
+
   // get widget string
   QString w = item->map().value("_widget_:" % tag,QString()).toString();
   if (w.isEmpty())
@@ -242,10 +246,11 @@ bool QJsonTreeItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model
           handleLeftMousePress(index);
         break;
         case Qt::RightButton:
-          // right mouse pressed
+          // right button pressed
           handleRightMousePress(me,index);
         break;
-        default:
+
+      default:
           break;
       }
     break;
@@ -293,6 +298,10 @@ void QJsonTreeItemDelegate::handleLeftMousePress(const QModelIndex &index)
   if (m.isEmpty())
     return;
 
+  // check if editing is enabled on the widget
+  if (!item->widget()->editingEnabled())
+    return;
+
   // get stuff from item
   QString tag = item->headerTagByIdx(idx.column());
   QVariant val = m.value(tag,QVariant());
@@ -318,6 +327,10 @@ void QJsonTreeItemDelegate::handleRightMousePress(QMouseEvent* event, const QMod
   QJsonTreeItem* item;
   QVariantMap m = model->mapByModelIndex(idx,&item);
   if (!item)
+    return;
+
+  // check if editing is enabled
+  if (!item->widget()->editingEnabled())
     return;
 
   QString name = m["name"].toString();
