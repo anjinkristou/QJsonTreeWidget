@@ -21,6 +21,7 @@
 #define QJSONTREEITEM_H
 
 #include <QtCore>
+#include "qjsontree_global.h"
 
 class QJsonTreeModel;
 class QJsonTreeWidget;
@@ -31,7 +32,7 @@ class QJsonSortFilterProxyModel;
  * @brief class to represent a tree item from a JSON object coming from QJsonTreeModel
  *
  */
- class QJsonTreeItem
+ class QJSONTREE_EXPORT QJsonTreeItem
  {
    friend class QJsonTreeModel;
    friend class QJsonTreeWidget;
@@ -196,7 +197,7 @@ class QJsonSortFilterProxyModel;
     * @param item internal (always 0)
     * @return QVariantMap
     */
-   const QVariantMap toMap(const QHash<QString,bool>& purgelist = QHash<QString,bool>(), int depth=0, QVariantMap intmap = QVariantMap(), QJsonTreeItem* item = 0) const;
+   QVariantMap toMap(const QHash<QString,bool>& purgelist = QHash<QString,bool>(), int depth=0, QVariantMap intmap = QVariantMap(), QJsonTreeItem* item = 0) const;
 
    /**
     * @brief returns the row at which this item is in the tree view, relative to its parent if any

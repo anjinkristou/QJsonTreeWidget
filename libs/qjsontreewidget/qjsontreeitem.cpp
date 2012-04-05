@@ -307,7 +307,7 @@ void QJsonTreeItem::setMapValue(int column, const QVariant &value)
   setMapValue(tag,value);
 }
 
-const QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int depth, QVariantMap intmap, QJsonTreeItem* item) const
+QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int depth, QVariantMap intmap, QJsonTreeItem* item) const
 {
   const QJsonTreeItem* it;
   if (depth == 0)
