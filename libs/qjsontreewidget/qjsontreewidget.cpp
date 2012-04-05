@@ -53,6 +53,10 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   m_actionDisableSort = new QAction(tr("Disable sorting"),m_view);
   m_actionLoad = new QAction(tr("Load from file"),m_view);
   m_actionSave = new QAction(tr("Save to file"),m_view);
+  m_actionEnableSort->setData("sortenable");
+  m_actionDisableSort->setData("sortdisable");
+  m_actionLoad->setData("load");
+  m_actionSave->setData("save");
   connect (m_actionLoad,SIGNAL(triggered()),this,SLOT(onActionLoad()));
   connect (m_actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
   connect (m_actionEnableSort,SIGNAL(triggered()),this,SLOT(onActionEnableSort()));
@@ -118,18 +122,18 @@ bool QJsonTreeWidget::loadJson(const QVariantMap &map)
     return loadJsonInternal(map);
 }
 
-bool QJsonTreeWidget::saveJson(const QString &path, QJson::IndentMode indentmode, const QList<QString>& purgelist, const QVariantMap& additional)
+bool QJsonTreeWidget::saveJson(const QString &path, QJson::IndentMode indentmode, const QVariantMap& additional)
 {
   QFile file(path);
   bool b = file.open(QIODevice::WriteOnly);
-  b = saveJson(file,indentmode,purgelist,additional);
+  b = saveJson(file,indentmode,additional);
   file.close();
   return b;
 }
 
-bool QJsonTreeWidget::saveJson(QIODevice &dev, QJson::IndentMode indentmode, const QList<QString>& purgelist, const QVariantMap& additional)
+bool QJsonTreeWidget::saveJson(QIODevice &dev, QJson::IndentMode indentmode, const QVariantMap& additional)
 {
-  QByteArray buf = saveJson(indentmode,purgelist,additional);
+  QByteArray buf = saveJson(indentmode,additional);
   if (buf.isEmpty())
   {
     setNotFoundInvalidOrEmptyError("saveJson","buf");
@@ -144,10 +148,10 @@ bool QJsonTreeWidget::saveJson(QIODevice &dev, QJson::IndentMode indentmode, con
   return true;
 }
 
-QByteArray QJsonTreeWidget::saveJson(QJson::IndentMode indentmode, const QList<QString>& purgelist, const QVariantMap& additional)
+QByteArray QJsonTreeWidget::saveJson(QJson::IndentMode indentmode, const QVariantMap& additional)
 {
   m_serializer->setIndentMode(indentmode);
-  QVariantMap m = m_root->child(0)->toMap(purgelist);
+  QVariantMap m = m_root->child(0)->toMap(m_purgeList);
   foreach (QString key, additional.keys())
   {
       m[key]=additional[key];
@@ -175,6 +179,7 @@ void QJsonTreeWidget::resizeColumnsToContents()
 
 void QJsonTreeWidget::clear()
 {
+  m_purgeList.clear();
   if (m_model)
     m_model->clear();
 }

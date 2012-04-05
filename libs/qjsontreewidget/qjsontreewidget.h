@@ -109,40 +109,36 @@
     *
     * @param path path to the JSON file to be saved
     * @param indentmode one of the indentation mode defined in QJson::IndentMode
-    * @param purgelist if not empty, items with a tag with these names are purged (even their childs)
     * @param additional an optional additional map to be added
     * @return bool
     */
-   bool saveJson(const QString& path, QJson::IndentMode indentmode, const QList<QString>& purgelist = QList<QString>(), const QVariantMap& additional = QVariantMap());
+   bool saveJson(const QString& path, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
 
    /**
     * @brief serializes the tree to a QIODevice file
     *
     * @param dev a QIODevice (i.e. QFile)
     * @param indentmode one of the indentation mode defined in QJson::IndentMode
-    * @param purgelist if not empty, items with a tag with these names are purged (even their childs)
     * @param additional an optional additional map to be added
     * @return bool
     */
-   bool saveJson (QIODevice& dev, QJson::IndentMode indentmode, const QList<QString>& purgelist = QList<QString>(), const QVariantMap& additional = QVariantMap());
+   bool saveJson (QIODevice& dev, QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
 
    /**
     * @brief serializes the tree to a JSON buffer
     *
     * @param indentmode one of the indentation mode defined in QJson::IndentMode
-    * @param purgelist if not empty, items with a tag with these names are purged (even their childs)
     * @param additional an optional additional map to be added
     * @return QByteArray
     */
-   QByteArray saveJson (QJson::IndentMode indentmode, const QList<QString>& purgelist = QList<QString>(), const QVariantMap& additional = QVariantMap());
+   QByteArray saveJson (QJson::IndentMode indentmode, const QVariantMap& additional = QVariantMap());
 
    /**
     * @brief saves the tree to a QVariantMap
     *
-    * @param purgelist if not empty, items with a tag with these names are purged (even their childs)
     * @return QVariantMap
     */
-   QVariantMap saveJson (const QList<QString>& purgelist = QList<QString>()) const { return m_model->root()->toMap(purgelist); }
+   QVariantMap saveJson () const { return m_model->root()->toMap(m_purgeList); }
 
    /**
     * @brief expands all the items in the tree (warning: if the view contains lot of items, it may take time)
@@ -289,11 +285,31 @@
    void setLoadFromFileEnabled (bool enable) { m_actionLoad->setVisible(enable); }
 
    /**
+    * @brief returns the state of the load-from-file action (visible/not visible)
+    *
+    * @return bool
+    */
+   bool loadFromFileEnabled() const { return m_actionLoad->isVisible(); }
+
+   /**
     * @brief returns the actions set in the view's header (to add custom actions)
     *
-    * return QList<QAction*>
+    * @return QList<QAction*>
     */
    QList<QAction*> headerActions() const { return m_view->header()->actions(); }
+
+   /**
+    * @brief sets the list of tags to be purged when saving the tree
+    * @param purgelist if not empty, an hash representing tags to strip off from saved JSON. true strips the item completely, including childs. false just strips the tag leaving the item
+    */
+   void setPurgeListOnSave (const QHash<QString, bool>& purgelist) { m_purgeList = purgelist; }
+
+   /**
+    * @brief returns the purge list to be applied on saving
+    *
+    * @return QHash<QString,bool>
+    */
+   const QHash<QString,bool> purgeListOnSave () const { return m_purgeList; }
 
  signals:
    /**
@@ -348,6 +364,7 @@
    QAction* m_actionSave;
    QAction* m_actionEnableSort;
    QAction* m_actionDisableSort;
+   QHash<QString,bool> m_purgeList;
    int m_maxVersion;
  };
 

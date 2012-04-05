@@ -288,7 +288,7 @@ void QJsonTreeItem::setMapValue(int column, const QVariant &value)
   setMapValue(tag,value);
 }
 
-const QVariantMap QJsonTreeItem::toMap(const QList<QString>& purgelist, int depth, QVariantMap intmap, QJsonTreeItem* item) const
+const QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int depth, QVariantMap intmap, QJsonTreeItem* item) const
 {
   const QJsonTreeItem* it;
   if (depth == 0)
@@ -305,6 +305,7 @@ const QVariantMap QJsonTreeItem::toMap(const QList<QString>& purgelist, int dept
 
   // this was added for optimization when building the tree
   intmap.remove("__hasROSet__");
+  bool returnempty = false;
 
   // check items to be purged
   if (!purgelist.isEmpty())
@@ -312,9 +313,22 @@ const QVariantMap QJsonTreeItem::toMap(const QList<QString>& purgelist, int dept
     foreach (QString k, intmap.keys())
     {
       if (purgelist.contains(k))
-        return QVariantMap();
+      {
+        if (purgelist.value(k,false) == true)
+        {
+          // strip the item completely
+          returnempty = true;
+        }
+        else
+        {
+          // just remove the tag
+          intmap.remove(k);
+        }
+      }
     }
   }
+  if (returnempty)
+    return QVariantMap();
 
   if (it->childCount() > 0)
   {

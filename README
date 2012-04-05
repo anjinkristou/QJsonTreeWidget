@@ -48,6 +48,12 @@ Usage is really simple, you just have to adopt this format for your tree:
 
 . the tree can be sorted using the setSortingEnabled(), setSortOrder() and setDynamicSortFiltering of QJsonTreeWidget.
 
+. the tree can be exported to QVariantMap, QByteArray JSON, QIODevice using the saveJson() function
+
+. when exporting, you can set the tree to purge JSON tags by using the setPurgeListOnSave() function
+
+. right clicking on the header let you access the sort and save popup menu
+ 
 . search can be performed on the tree using the search() function. You can advance to the next item in the search using F3.
 
 . using CTRL-C you can copy the selected item text to the clipboard.
