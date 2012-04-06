@@ -127,6 +127,22 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
   if (tag.isEmpty())
     return QVariant();
 
+  // check color
+  if (role == Qt::ForegroundRole)
+  {
+    QPalette pal = QApplication::style()->standardPalette();
+    if (item->hasChildren())
+    {
+      // its a parent
+      return QVariant(pal.color(QPalette::Dark));
+    }
+    else
+    {
+      // its a leaf
+      return QVariant(pal.color(QPalette::WindowText));
+    }
+  }
+
   // skip custom drawn items (they could be buttons, they have usually no values... maybe we could change that later)
   QHash<QString, QHash<QString, QVariant> >  h = item->headers();
   if (h[tag].contains("__draw__"))
@@ -273,8 +289,8 @@ void QJsonTreeModel::setSpecialFlags(QJsonTreeItem::SpecialFlags flags)
 
 QJsonTreeItem *QJsonTreeModel::itemByModelIndex(const QModelIndex &index, int role) const
 {
-  // check if index is valid and display role is requested
-  if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole))
+  // check if index is valid and one of these roles is requested
+  if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ForegroundRole && role != Qt::ToolTipRole))
     return 0;
 
   // get item

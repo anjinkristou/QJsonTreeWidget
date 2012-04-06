@@ -21,6 +21,8 @@
 #define QJSONTREEMODEL_H
 
 #include <QtCore>
+#include <QApplication>
+#include <QStyle>
 #include "qjsontreeitem.h"
 
 class QJsonTreeItemDelegate;

@@ -290,7 +290,7 @@ void QJsonTreeItemDelegate::buildWidgetTypes()
 void QJsonTreeItemDelegate::handleLeftMousePress(const QModelIndex &index)
 {
   QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
-  const QJsonTreeModel* model = QJsonSortFilterProxyModel::indexSourceModel(idx);
+  const QJsonTreeModel* model = static_cast<const QJsonTreeModel*>(idx.model());
 
   // get item
   QJsonTreeItem* item;
@@ -316,14 +316,14 @@ void QJsonTreeItemDelegate::handleLeftMousePress(const QModelIndex &index)
   // if it's a button, emit the button clicked signal too. this is just a shortcut for the above signal
   if (val.toString().startsWith("QPushButton,",Qt::CaseInsensitive) && !val.isNull())
   {
-    emit clicked(item,tag);
+    emit clicked( item,tag);
   }
 }
 
 void QJsonTreeItemDelegate::handleRightMousePress(QMouseEvent* event, const QModelIndex &index)
 {
   QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
-  const QJsonTreeModel* model = QJsonSortFilterProxyModel::indexSourceModel(idx);
+  const QJsonTreeModel* model = static_cast<const QJsonTreeModel*>(idx.model());
   QJsonTreeItem* item;
   QVariantMap m = model->mapByModelIndex(idx,&item);
   if (!item)
@@ -356,7 +356,12 @@ void QJsonTreeItemDelegate::handleRightMousePress(QMouseEvent* event, const QMod
     if (canadd)
     {
       QAction* action = new QAction(tr("Add '") % t->map()["name"].toString() % "'",menu);
+
+      // swap purgelist if set, replacing after toMap()
+      QHash<QString,bool> purgelist = t->widget()->purgeListOnSave();
+      t->widget()->setPurgeListOnSave(QHash<QString,bool>());
       action->setData(t->toMap());
+      t->widget()->setPurgeListOnSave(purgelist);
       menu->addAction(action);
     }
     else
