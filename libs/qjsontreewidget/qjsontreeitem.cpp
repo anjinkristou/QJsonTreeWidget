@@ -239,6 +239,28 @@ QString QJsonTreeItem::text(int column) const
   return m_map.value(tag,QString()).toString();
 }
 
+bool QJsonTreeItem::validateRegexp(QString* nonmatchingcol, QString* nonmatchingname, QString* nonmatchingval) const
+{
+  for (int i=0; i < this->columnCount(); i++)
+  {
+    // check if we have a regexp set
+    QString tag = headerTagByIdx(i);
+    QRegExp rx = QRegExp(m_map.value("_regexp_:" % tag,QString()).toString());
+    if (rx.isEmpty())
+      continue;
+
+    QString val = m_map.value(tag,QString()).toString();
+    if (!rx.exactMatch(val))
+    {
+      *nonmatchingcol = headerNameByIdx(i);
+      *nonmatchingname = m_map.value("name",QString()).toString();
+      *nonmatchingval = val;
+      return false;
+    }
+  }
+  return true;
+}
+
 int QJsonTreeItem::row() const
 {
   // if there's a parent item, this item's corresponding row is taken from the childs index of its parent. either, its the 1st row (row 0, this is a parent item)

@@ -340,6 +340,15 @@
     */
    bool purgeDescriptiveTags() const { return m_purgeDescriptiveTags; }
 
+
+   /**
+    * @brief check regular expressions set in the items having _regexp_ set (QLineEdit). returns false on the first mismatch
+    *
+    * @param item 0 for the whole tree, or a specific item
+    * @return bool
+    */
+   bool checkRegExps(const QJsonTreeItem* item = 0) const;
+
  signals:
    /**
     * @brief connect to this signal to be notified of generic mouseclicks on the view

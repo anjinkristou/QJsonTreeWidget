@@ -352,6 +352,17 @@ class QJsonSortFilterProxyModel;
     */
    QString text(int column) const;
 
+   /**
+    * @brief returns true if all the _regexp_ defined in the item's map matches their assigned values, or false if it doesnt.
+    * it's valid only for items representing one or more QLineEdit and having one or more regexps set. if not, it returns true as default
+    *
+    * @param nonmatchingcol on false return, name of the first nonmatching column
+    * @param nonmatchingname on false return, name of the first nonmatching name
+    * @param nonmatchingval on false return, name of the first nonmatching value
+    * @return bool
+    */
+   bool validateRegexp(QString* nonmatchingcol, QString* nonmatchingname, QString* nonmatchingval) const;
+
  protected:
    QJsonTreeModel* model();
    QTreeView *view();

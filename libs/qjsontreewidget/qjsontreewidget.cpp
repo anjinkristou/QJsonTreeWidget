@@ -388,3 +388,35 @@ void QJsonTreeWidget::onActionDisableSort()
 {
   setSortingEnabled(false);
 }
+
+bool QJsonTreeWidget::checkRegExps(const QJsonTreeItem* item) const
+{
+  // whole tree ?
+  if (item == 0)
+  {
+    item = m_root;
+
+    // empty tree ?
+    if (item == 0)
+      return true;
+  }
+
+  QString failname;
+  QString failcol;
+  QString failval;
+  if (!item->validateRegexp(&failcol,&failname,&failval))
+  {
+    QMessageBox::warning(0,tr("Invalid input"), tr("Name: ") % failname % "\n" % tr("Column: ") % failcol % "\n" % tr("Text: ") % failval);
+    return false;
+  }
+  if (item->childCount() > 0)
+  {
+    foreach (QJsonTreeItem* it, item->children())
+    {
+      // recurse
+      if (!checkRegExps(it))
+        return false;
+    }
+  }
+  return true;
+}
