@@ -363,6 +363,16 @@ class QJsonSortFilterProxyModel;
     */
    bool validateRegexp(QString* nonmatchingcol, QString* nonmatchingname, QString* nonmatchingval) const;
 
+   /**
+    * @brief returns true on the first time the tag specified is found
+    *
+    * @param tag tag to scan for, recursively
+    * @param value if not null, value is set to tag value on return
+    * @param internal reserved, must be 0
+    * @return bool
+    */
+   bool findTagRecursive (const QString& tag, QVariant* value = 0, const QJsonTreeItem* internal = 0) const;
+
  protected:
    QJsonTreeModel* model();
    QTreeView *view();
