@@ -138,7 +138,7 @@
     *
     * @return QVariantMap
     */
-   QVariantMap saveJson () const { return m_model->root()->toMap(m_purgeList); }
+   QVariantMap saveJson () const { return m_model->root()->toMap(); }
 
    /**
     * @brief expands all the items in the tree (warning: if the view contains lot of items, it may take time)

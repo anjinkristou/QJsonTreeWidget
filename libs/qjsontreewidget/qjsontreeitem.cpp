@@ -23,7 +23,7 @@
 QHash<QString,Qt::ItemFlags> QJsonTreeItem::widgetFlags;
 QStringList QJsonTreeItem::descriptiveTags;
 
-QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, const QVariantMap &map)
+QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, const QVariantMap &map, bool ignoreheaders)
 {
   m_headersCount = 0;
   m_widget = 0;
@@ -43,10 +43,10 @@ QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, cons
     return;
 
   // create item from map
-  fromMap(map,parent);
+  fromMap(map,parent,ignoreheaders);
 }
 
-bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
+bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent,bool ignoreheaders)
 {
   m_parent = parent;
   m_map = map;
@@ -56,7 +56,7 @@ bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent)
     m_root = this;
 
     // this is the root item, must have "_headers_" set, store headers descriptor in m_headers
-    if (!setColumnHeaders(map.value("_headers_",QString()).toString()))
+    if (!setColumnHeaders(map.value("_headers_",QString()).toString()) && !ignoreheaders)
     {
       m_error = QJsonTreeItem::JsonMissingOrInvalidHeaders;
       m_invalidMap = m_map;
@@ -307,7 +307,7 @@ void QJsonTreeItem::setMapValue(int column, const QVariant &value)
   setMapValue(tag,value);
 }
 
-QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int depth, QVariantMap intmap, QJsonTreeItem* item) const
+QVariantMap QJsonTreeItem::toMap(int depth, QVariantMap intmap, QJsonTreeItem* item) const
 {
   const QJsonTreeItem* it;
   if (depth == 0)
@@ -327,6 +327,7 @@ QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int depth
   bool returnempty = false;
 
   // check items to be purged
+  QHash<QString,bool> purgelist = it->widget()->purgeListOnSave();
   if (!purgelist.isEmpty())
   {
     foreach (QString k, intmap.keys())
@@ -373,7 +374,7 @@ QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int depth
     {
       // recurse
       depth++;
-      QVariantMap mm = i->toMap(purgelist,depth,intmap,i);
+      QVariantMap mm = i->toMap(depth,intmap,i);
       if (!mm.isEmpty())
       {
           l.append(mm);
@@ -387,7 +388,6 @@ QVariantMap QJsonTreeItem::toMap(const QHash<QString,bool>& purgelist, int depth
 
   return intmap;
 }
-
 
 QJsonTreeModel* QJsonTreeItem::model()
 {

@@ -67,17 +67,19 @@ class QJsonSortFilterProxyModel;
   * @param tree : the QJsonTreeWidget this item belongs to
   * @param parent : the item parent (optional)
   * @param map: the item data as a map coming from QJson (optional)
+  * @param ignoreheaders: set to true if you're constructing a spare item (to not be connected to a tree)
   */
-   QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent = 0, const QVariantMap &map = QVariantMap());
+   QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent = 0, const QVariantMap &map = QVariantMap(), bool ignoreheaders=false);
 
    /**
     * @brief fills an item from a QJson map, replacing previous content
     *
     * @param map: the item data as a map coming from QJson
     * @param parent : the item parent (optional)
+    * @param ignoreheaders: set to true if you're constructing a spare item (to not be connected to a tree)
     * @return bool
     */
-   bool fromMap(const QVariantMap &map, QJsonTreeItem *parent = 0);
+   bool fromMap(const QVariantMap &map, QJsonTreeItem *parent = 0, bool ignoreheaders=false);
 
    /**
     * @brief destructor
@@ -191,13 +193,12 @@ class QJsonSortFilterProxyModel;
    /**
     * @brief recursively rebuilds the JSON map from the tree structure
     *
-    * @param purgelist if not empty, an hash representing tags to strip off from saved JSON. true strips the item completely, including childs. false just strips the tag leaving the item
     * @param depth internal (always 0)
     * @param intmap internal (always 0)
     * @param item internal (always 0)
     * @return QVariantMap
     */
-   QVariantMap toMap(const QHash<QString,bool>& purgelist = QHash<QString,bool>(), int depth=0, QVariantMap intmap = QVariantMap(), QJsonTreeItem* item = 0) const;
+   QVariantMap toMap(int depth=0, QVariantMap intmap = QVariantMap(), QJsonTreeItem* item = 0) const;
 
    /**
     * @brief returns the row at which this item is in the tree view, relative to its parent if any

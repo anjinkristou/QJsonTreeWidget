@@ -153,7 +153,7 @@ bool QJsonTreeWidget::saveJson(QIODevice &dev, QJson::IndentMode indentmode, con
 QByteArray QJsonTreeWidget::saveJson(QJson::IndentMode indentmode, const QVariantMap& additional)
 {
   m_serializer->setIndentMode(indentmode);
-  QVariantMap m = m_root->child(0)->toMap(m_purgeList);
+  QVariantMap m = m_root->child(0)->toMap();
   foreach (QString key, additional.keys())
   {
       m[key]=additional[key];
@@ -182,6 +182,7 @@ void QJsonTreeWidget::resizeColumnsToContents()
 void QJsonTreeWidget::clear()
 {
   m_purgeList.clear();
+  m_purgeDescriptiveTags = false;
   if (m_model)
     m_model->clear();
 }
