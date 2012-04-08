@@ -48,62 +48,61 @@ public:
    * @brief destructor
    *
    */
-  ~QJsonTreeItemDelegate();
+  virtual ~QJsonTreeItemDelegate();
 
    /**
-     * @brief implementation of createEditor() from QAbstractItemDelegate interface
+     * @brief reimplementation of createEditor() from QAbstractItemDelegate interface
      *
      * @param parent the parent widget
      * @param option parameters to draw the widget
      * @param index the model index
      */
-    QWidget* createEditor ( QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    virtual QWidget* createEditor ( QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
     /**
-     * @brief implementation of setEditorData() from QAbstractItemDelegate interface
+     * @brief reimplementation of setEditorData() from QAbstractItemDelegate interface
      *
      * @param editor the editor
      * @param index the model index
      */
-    void	setEditorData ( QWidget * editor, const QModelIndex & index ) const;
+    virtual void	setEditorData ( QWidget * editor, const QModelIndex & index ) const;
 
     /**
-     * @brief implementation of setModelData() from QAbstractItemDelegate interface
+     * @brief reimplementation of setModelData() from QAbstractItemDelegate interface
      *
      * @param editor the editor
      * @param model the model
      * @param index the model index
      */
-    void	setModelData ( QWidget * editor, QAbstractItemModel * model, const QModelIndex & index ) const;
+    virtual void	setModelData ( QWidget * editor, QAbstractItemModel * model, const QModelIndex & index ) const;
 
     /**
-     * @brief implementation of paint() from QAbstractItemDelegate interface
+     * @brief reimplementation of paint() from QAbstractItemDelegate interface
      *
      * @param painter the painter to render the item
      * @param option the options to render the item
      * @param index the model index
      */
-    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
     /**
-     * @brief implementation of updateEditorGeometry() from QAbstractItemDelegate interface
+     * @brief reimplementation of updateEditorGeometry() from QAbstractItemDelegate interface
      *
      * @param editor the editor
      * @param option the options to render the item
      * @param index the model index
      */
-    void	updateEditorGeometry ( QWidget * editor, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    virtual void	updateEditorGeometry ( QWidget * editor, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
-protected:
     /**
-     * @brief implementation of editorEvent() from QAbstractItemDelegate interface
+     * @brief reimplementation of editorEvent() from QAbstractItemDelegate interface
      *
      * @param event the event (mouse events, ...)
      * @param model the model
      * @param option the options to render the item
      * @param index the model index
      */
-    bool editorEvent ( QEvent * event, QAbstractItemModel * model, const QStyleOptionViewItem & option, const QModelIndex & index );
+    virtual bool editorEvent ( QEvent * event, QAbstractItemModel * model, const QStyleOptionViewItem & option, const QModelIndex & index );
 
 signals:
     void clicked (int column, int row, const QString& jsontag, const QVariant& value, const QJsonTreeItem* item);

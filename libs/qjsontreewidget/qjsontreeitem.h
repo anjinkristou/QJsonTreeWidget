@@ -85,7 +85,7 @@ class QJsonSortFilterProxyModel;
     * @brief destructor
     *
     */
-   ~QJsonTreeItem();
+   virtual ~QJsonTreeItem();
 
    /**
     * @brief adds a child node to this item
@@ -363,29 +363,18 @@ class QJsonSortFilterProxyModel;
     */
    bool validateRegexp(QString* nonmatchingcol, QString* nonmatchingname, QString* nonmatchingval) const;
 
-   /**
-    * @brief returns true on the first time the tag specified is found
-    *
-    * @param tag tag to scan for, recursively
-    * @param value if not null, value is set to tag value on return
-    * @param internal reserved, must be 0
-    * @return bool
-    */
-   bool findTagRecursive (const QString& tag, QVariant* value = 0, const QJsonTreeItem* internal = 0) const;
-
  protected:
    QJsonTreeModel* model();
    QTreeView *view();
-   static QHash<QString, Qt::ItemFlags> widgetFlags;
-   static QStringList descriptiveTags;
-   bool setColumnHeaders(const QString &headers);
-   const QString headerNameOrTagByString(const QString &name, bool returntag, int *column) const;
-   const QString headerNameOrTagByInt(int column, bool returntag) const;
 
  private:
    static void buildWidgetFlags();
    static void buildDescriptiveTags();
-
+   bool setColumnHeaders(const QString &headers);
+   const QString headerNameOrTagByString(const QString &name, bool returntag, int *column) const;
+   const QString headerNameOrTagByInt(int column, bool returntag) const;
+   static QHash<QString, Qt::ItemFlags> widgetFlags;
+   static QStringList descriptiveTags;
    QJsonTreeItem::JsonMapErrors m_error;
    QModelIndex m_index;
    QList<QJsonTreeItem*> m_children;

@@ -261,40 +261,6 @@ bool QJsonTreeItem::validateRegexp(QString* nonmatchingcol, QString* nonmatching
   return true;
 }
 
-bool QJsonTreeItem::findTagRecursive(const QString &tag, QVariant *value, const QJsonTreeItem* internal) const
-{
-  QVariantMap m;
-  if (internal == 0)
-  {
-    internal = this;
-    m = m_map;
-  }
-  else
-  {
-    m = internal->map();
-  }
-
-  if (m.contains(tag))
-  {
-    if (value)
-    {
-      *value = m[tag];
-    }
-    return true;
-  }
-
-  if (internal->childCount() > 0)
-  {
-    foreach (QJsonTreeItem* it, internal->children())
-    {
-      // recurse
-      if (findTagRecursive(tag,value,it))
-        return true;
-    }
-  }
-  return false;
-}
-
 int QJsonTreeItem::row() const
 {
   // if there's a parent item, this item's corresponding row is taken from the childs index of its parent. either, its the 1st row (row 0, this is a parent item)

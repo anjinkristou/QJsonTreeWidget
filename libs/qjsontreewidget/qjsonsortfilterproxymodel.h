@@ -31,12 +31,51 @@ class QJsonSortFilterProxyModel : public QSortFilterProxyModel
   friend class QJsonTreeItem;
   Q_OBJECT
 protected:
+ /**
+  * @brief reimplementation of filterAcceptsRow() from the QSortFilterProxyModel interface
+  *
+  * @param source_row the row index in the source model
+  * @param source_parent the parent model index
+  * @return bool
+  */
   virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 
 public:
+  /**
+   * @brief constructor
+   *
+   * @param parent the parent object (optional)
+   */
   explicit QJsonSortFilterProxyModel(QObject *parent = 0);
+
+  /**
+   * @brief destructor
+   *
+   */
+  virtual ~QJsonSortFilterProxyModel();
+
+  /**
+   * @brief helper function to map an index to the source model index (calls mapToSource() on the index model)
+   *
+   * @param index must be a proxy model index
+   * @return QModelIndex
+   */
   static QModelIndex indexToSourceIndex (const QModelIndex& index);
+
+  /**
+   * @brief helper function to map an index to the proxy model index (calls mapToSource() on the index model)
+   *
+   * @param index must be a source model index
+   * @return QModelIndex
+   */
   static QModelIndex indexToProxyIndex (const QModelIndex& index);
+
+  /**
+   * @brief helper function to retrieve the index source model
+   *
+   * @param index must be a proxy model index
+   * @return const QJsonTreeModel*
+   */
   static const QJsonTreeModel* indexSourceModel (const QModelIndex& index);
 };
 

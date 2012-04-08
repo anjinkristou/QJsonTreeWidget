@@ -21,10 +21,8 @@
 #define QJSONTREEMODEL_H
 
 #include <QtCore>
-#include <QApplication>
-#include <QStyle>
 #include "qjsontreeitem.h"
-
+#include <QColor>
 class QJsonTreeItemDelegate;
 
 /**
@@ -52,7 +50,7 @@ public:
    * @brief destructor
    *
    */
-  ~QJsonTreeModel();
+  virtual ~QJsonTreeModel();
 
   /**
    * @brief returns the root tree item (the whole tree itself), which is used only to store private data.
@@ -63,88 +61,88 @@ public:
   QJsonTreeItem* root() const { return m_root; }
 
   /**
-   * @brief implementation of index() from the QAbstractItemModel interface
+   * @brief reimplementation of index() from the QAbstractItemModel interface
    *
    * @param row the row
    * @param column the column
    * @param parent the parent index (optional)
    * @return QModelIndex
    */
-  QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex()) const;
+  virtual QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex()) const;
 
   /**
-   * @brief implementation of parent() from the QAbstractItemModel interface
+   * @brief reimplementation of parent() from the QAbstractItemModel interface
    *
    * @param index the model index
    * @return QModelIndex
    */
-  QModelIndex parent ( const QModelIndex & index ) const;
+  virtual QModelIndex parent ( const QModelIndex & index ) const;
 
   /**
-   * @brief implementation of rowCount() from the QAbstractItemModel interface
+   * @brief reimplementation of rowCount() from the QAbstractItemModel interface
    *
    * @param parent the parent index (optional)
    * @return int
    */
-  int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
+  virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
 
   /**
-   * @brief implementation of columnCount() from the QAbstractItemModel interface
+   * @brief reimplementation of columnCount() from the QAbstractItemModel interface
    *
    * @param parent the parent index (optional)
    * @return int
    */
-  int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+  virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
 
   /**
-   * @brief implementation of data() from the QAbstractItemModel interface
+   * @brief reimplementation of data() from the QAbstractItemModel interface
    *
    * @param index the model index
    * @param role the index role (optional)
    * @return QVariant
    */
-  QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+  virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
 
   /**
-   * @brief implementation of setData() from the QAbstractItemModel interface, to provide data editing
+   * @brief reimplementation of setData() from the QAbstractItemModel interface, to provide data editing
    *
    * @param index the model index
    * @param value the value to set in the model at index
    * @param role the index role (optional)
    * @return bool
    */
-  bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
 
   /**
-   * @brief implementation of flags() from the QAbstractItemModel interface, to provide data editing
+   * @brief reimplementation of flags() from the QAbstractItemModel interface, to provide data editing
    *
    * @param index the model index
    * @return Qt::ItemFlags
    */
-  Qt::ItemFlags flags ( const QModelIndex & index ) const;
+  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
 
   /**
-   * @brief implementation of headerData() from the QAbstractItemModel interface, to display the column's header.
+   * @brief reimplementation of headerData() from the QAbstractItemModel interface, to display the column's header.
    *
    * @param section the header section (= column)
    * @param orientation the orientation
    * @param role the section role (optional)
    * @return QVariant
    */
-  QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+  virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
   /**
-   * @brief implementation of removeRows() from the QAbstractItemModel interface
+   * @brief reimplementation of removeRows() from the QAbstractItemModel interface
    *
    * @param row the (initial) row to remove
    * @param count is > 1, remove count rows from row on
    * @param parent the parent index (optional)
    * @return bool
    */
-  bool removeRows ( int row, int count, const QModelIndex & parent = QModelIndex());
+  virtual bool removeRows ( int row, int count, const QModelIndex & parent = QModelIndex());
 
   /**
-   * @brief implementation of removeRow() from the QAbstractItemModel interface (this just calls removeRows with count = 1)
+   * @brief reimplementation of removeRow() from the QAbstractItemModel interface (this just calls removeRows with count = 1)
    *
    * @param row the row to remove
    * @param parent the parent index (optional)
@@ -153,17 +151,17 @@ public:
   bool removeRow(int row, const QModelIndex &parent = QModelIndex()) { return removeRows(row,1,parent); }
 
   /**
-   * @brief implementation of insertRows() from the QAbstractItemModel interface
+   * @brief reimplementation of insertRows() from the QAbstractItemModel interface
    *
    * @param row the row where to append the rows after
    * @param count number of rows to insert
    * @param parent the parent index (optional)
    * @return bool
    */
-  bool insertRows ( int row, int count, const QModelIndex & parent = QModelIndex());
+  virtual bool insertRows ( int row, int count, const QModelIndex & parent = QModelIndex());
 
   /**
-   * @brief implementation of insertRow() from the QAbstractItemModel interface
+   * @brief reimplementation of insertRow() from the QAbstractItemModel interface
    *
    * @param row the row where to insert the rows after
    * @param parent the parent index (optional)
@@ -172,12 +170,12 @@ public:
   bool insertRow (int row, const QModelIndex &parent = QModelIndex());
 
   /**
-   * @brief implementation of hasChildren() from the QAbstractItemModel interface
+   * @brief reimplementation of hasChildren() from the QAbstractItemModel interface
    *
    * @param parent the parent index (optional)
    * @return bool
    */
-  bool hasChildren ( const QModelIndex & parent = QModelIndex() );
+  virtual bool hasChildren ( const QModelIndex & parent = QModelIndex() );
 
   /**
    * @brief clears the model by calling reset and deleting the tree
@@ -190,7 +188,7 @@ public:
    *
    * @param index the model index
    * @param role the display role (optional)
-   * return QJsonTreeItem
+   * @return QJsonTreeItem
    */
   QJsonTreeItem* itemByModelIndex (const QModelIndex& index, int role = Qt::DisplayRole) const;
 
@@ -200,7 +198,7 @@ public:
    * @param index the model index
    * @param item on return, the corresponding QJsonTreeItem* (optional)
    * @param role the display role (optional)
-   * return const QString
+   * @return const QString
    */
   const QString tagByModelIndex (const QModelIndex &index, QJsonTreeItem** item=0,int role = Qt::DisplayRole) const;
 
@@ -210,7 +208,7 @@ public:
    * @param index the model index
    * @param item on return, the corresponding QJsonTreeItem* (optional)
    * @param role the display role (optional)
-   * return QVariantMap
+   * @return QVariantMap
    */
   QVariantMap mapByModelIndex (const QModelIndex& index, QJsonTreeItem** item=0,int role = Qt::DisplayRole) const;
 
@@ -219,16 +217,56 @@ public:
    *
    * @param item the QJsonTreeWidget item
    * @param column the column
-   * return const QModelIndex
+   * @return const QModelIndex
    */
   const QModelIndex indexByItem(QJsonTreeItem *item, int column) const;
 
-protected:
+  /**
+   * @brief influences how the model treats items with _hide_ and _readonly_ or any other special flags defined
+   *
+   * @param flags one or more QJsonTreeItem::SpecialFlags
+   */
   void setSpecialFlags(QJsonTreeItem::SpecialFlags flags);
+
+  /**
+   * @brief returns the special flags set
+   *
+   * @return QJsonTreeItem::SpecialFlags
+   */
   QJsonTreeItem::SpecialFlags specialFlags() const { return m_specialFlags; }
 
- private:
+  /**
+   * @brief sets the color used to display parents
+   *
+   * @param color the color to be set
+   */
+  void setParentColor (const QColor& color) {m_parentColor = color; }
+
+  /**
+   * @brief returns the color set for displaying parents
+   *
+   * @return QColor
+   */
+  QColor parentColor () const { return m_parentColor; }
+
+  /**
+   * @brief sets the color used to display childs
+   *
+   * @param color the color to be set
+   */
+  void setChildColor (const QColor& color) {m_childColor = color; }
+
+  /**
+   * @brief returns the color set for displaying childs
+   *
+   * @return QColor
+   */
+  QColor childColor () const { return m_childColor; }
+
+private:
   QJsonTreeItem* parentItem(const QModelIndex& parent) const;
+  QColor m_parentColor;
+  QColor m_childColor;
   QJsonTreeItem* m_root;
   QJsonTreeItem::SpecialFlags m_specialFlags;
 };

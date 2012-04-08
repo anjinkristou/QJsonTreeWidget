@@ -23,6 +23,11 @@ QJsonSortFilterProxyModel::QJsonSortFilterProxyModel(QObject *parent) :
 {
 }
 
+QJsonSortFilterProxyModel::~QJsonSortFilterProxyModel()
+{
+
+}
+
 bool QJsonSortFilterProxyModel::filterAcceptsRow ( int source_row, const QModelIndex & source_parent ) const
 {
   if (!source_parent.isValid())
@@ -60,16 +65,16 @@ bool QJsonSortFilterProxyModel::filterAcceptsRow ( int source_row, const QModelI
 
 QModelIndex QJsonSortFilterProxyModel::indexToSourceIndex (const QModelIndex& index)
 {
-  return static_cast<const QSortFilterProxyModel*>(index.model())->mapToSource(index);
+  return static_cast<const QJsonSortFilterProxyModel*>(index.model())->mapToSource(index);
 }
 
 QModelIndex QJsonSortFilterProxyModel::indexToProxyIndex (const QModelIndex& index)
 {
-  return static_cast<const QSortFilterProxyModel*>(index.model())->mapFromSource(index);
+  return static_cast<const QJsonSortFilterProxyModel*>(index.model())->mapFromSource(index);
 }
 
 const QJsonTreeModel* QJsonSortFilterProxyModel::indexSourceModel (const QModelIndex& index)
 {
-  const QSortFilterProxyModel* m = static_cast <const QSortFilterProxyModel*>(index.model());
+  const QJsonSortFilterProxyModel* m = static_cast <const QJsonSortFilterProxyModel*>(index.model());
   return static_cast<const QJsonTreeModel*>(m->sourceModel());
 }

@@ -130,16 +130,28 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
   // check color
   if (role == Qt::ForegroundRole)
   {
-    QPalette pal = QApplication::style()->standardPalette();
+    // read only should be always displayed as disabled
+    QString rotag ("_readonly_:" % tag);
+    if (item->map().contains(rotag))
+      return QVariant();
+
     if (item->hasChildren())
     {
       // its a parent
-      return QVariant(pal.color(QPalette::Dark));
+      if (!m_parentColor.isValid())
+      {
+        return QVariant();
+      }
+      return QVariant(m_parentColor);
     }
     else
     {
-      // its a leaf
-      return QVariant(pal.color(QPalette::WindowText));
+      // its a child
+      if (!m_childColor.isValid())
+      {
+        return QVariant();
+      }
+      return QVariant(m_childColor);
     }
   }
 

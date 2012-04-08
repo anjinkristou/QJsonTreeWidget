@@ -138,7 +138,7 @@
     *
     * @return QVariantMap
     */
-   QVariantMap saveJson () const { return m_model->root()->toMap(); }
+   QVariantMap saveJson () const { if (!m_model) return QVariantMap(); return m_model->root()->toMap(); }
 
    /**
     * @brief expands all the items in the tree (warning: if the view contains lot of items, it may take time)
@@ -177,7 +177,7 @@
     * all the displayed items by the view are children of this item. this is to be consistent with other widget-based QT api.
     * @return QJsonTreeItem
     */
-   QJsonTreeItem* invisibleRootItem() const { return m_model->root(); }
+   QJsonTreeItem* invisibleRootItem() const { if (!m_model) return 0; return m_model->root(); }
 
    /**
     * @brief clears the widget
@@ -190,14 +190,14 @@
     *
     * @param QJsonTreeItem::SpecialFlag one or more special flags
     */
-   void setSpecialFlags(QJsonTreeItem::SpecialFlags flags) { m_model->setSpecialFlags(flags); }
+   void setSpecialFlags(QJsonTreeItem::SpecialFlags flags) { if (m_model) m_model->setSpecialFlags(flags); }
 
    /**
     * @brief returns the current value of special flags
     *
     * @return QJsonTreeItem::SpecialFlags
     */
-   QJsonTreeItem::SpecialFlags specialFlags() const { return m_model->specialFlags(); }
+   QJsonTreeItem::SpecialFlags specialFlags() const { if (!m_model) return 0; return m_model->specialFlags(); }
 
    /**
     * @brief set the last view's header section stretched or not
@@ -347,7 +347,46 @@
     * @param item 0 for the whole tree, or a specific item
     * @return bool
     */
-   bool checkRegExps(const QJsonTreeItem* item = 0) const;
+   bool validateItems(const QJsonTreeItem* item = 0) const;
+
+   /**
+    * @brief returns true on the first time the specified tag is found
+    *
+    * @param tag tag to scan for, recursively
+    * @param item 0 for the whole tree, or a specific item
+    * @param found if not null, on return points to the item in which tag has been found
+    * @return bool
+    */
+   bool findTag(const QString& tag, const QJsonTreeItem *item = 0, QJsonTreeItem **found = 0) const;
+
+   /**
+    * @brief sets the color used to display parents
+    *
+    * @param color the color to be set
+    */
+   void setParentColor (const QColor& color) {if (m_model) m_model->setParentColor(color); }
+
+   /**
+    * @brief returns the color set for displaying parents
+    *
+    * @return QColor
+    */
+   QColor parentColor () const { if (!m_model) return QColor(); return m_model->parentColor(); }
+
+   /**
+    * @brief sets the color used to display childs
+    *
+    * @param color the color to be set
+    */
+   void setChildColor (const QColor& color) {if (m_model) m_model->setChildColor(color); }
+
+   /**
+    * @brief returns the color set for displaying childs
+    *
+    * @return QColor
+    */
+   QColor childColor () const { if (!m_model) return QColor(); return m_model->childColor(); }
+
 
  signals:
    /**
@@ -381,12 +420,12 @@
    QJsonSortFilterProxyModel* proxyModel() const { return m_proxyModel; }
    QTreeView* view() const { return m_view; }
    QJsonTreeModel* model() const { return m_model; }
-   bool loadJsonInternal(const QVariantMap &map);
-   void setNotFoundInvalidOrEmptyError(const QString &function, const QString &val);
    virtual void keyPressEvent(QKeyEvent *event);
 
  private:
    void searchInternal();
+   bool loadJsonInternal(const QVariantMap &map);
+   void setNotFoundInvalidOrEmptyError(const QString &function, const QString &val);
 
    QTreeView* m_view;
    QGridLayout* m_optLayout;

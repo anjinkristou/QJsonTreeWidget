@@ -39,6 +39,8 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   m_view = new QTreeView(this);
   m_view->setHeaderHidden(false);
   m_view->setSortingEnabled(false);
+  m_view->setAnimated(true);
+  m_view->setAlternatingRowColors(true);
   l->addWidget(m_view);
 
   // add an optional layout for the user to put its controls in
@@ -67,9 +69,6 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   m_actionDisableSort->setVisible(false);
   m_view->header()->addActions(QList<QAction*>() << m_actionEnableSort << m_actionDisableSort << m_actionLoad << m_actionSave);
   m_view->header()->setContextMenuPolicy(Qt::ActionsContextMenu);
-
-  // to update the model on edits
-  connect (m_model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(onDataChanged(QModelIndex,QModelIndex)));
 
   // for mouseclicks
   connect (m_delegate,SIGNAL(clicked(const QJsonTreeItem*,QString)),this,SIGNAL(clicked(const QJsonTreeItem*,QString)));
@@ -190,7 +189,7 @@ void QJsonTreeWidget::clear()
 void QJsonTreeWidget::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
   // since we emit onDataChanged with (index,index), topLeft is enough
-  m_view->update(QJsonSortFilterProxyModel::indexToSourceIndex(topLeft));
+  m_view->update(topLeft);
 }
 
 void QJsonTreeWidget::nextSelection()
@@ -314,6 +313,7 @@ bool QJsonTreeWidget::loadJsonInternal(const QVariantMap& map)
     delete m_proxyModel;
 
   m_model = new QJsonTreeModel(m_root,this);
+  connect (m_model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(onDataChanged(QModelIndex,QModelIndex)));
   m_proxyModel = new QJsonSortFilterProxyModel(this);
   m_proxyModel->setDynamicSortFilter(true);
   m_proxyModel->setSourceModel(m_model);
@@ -389,16 +389,12 @@ void QJsonTreeWidget::onActionDisableSort()
   setSortingEnabled(false);
 }
 
-bool QJsonTreeWidget::checkRegExps(const QJsonTreeItem* item) const
+bool QJsonTreeWidget::validateItems(const QJsonTreeItem* item) const
 {
   // whole tree ?
   if (item == 0)
   {
     item = m_root;
-
-    // empty tree ?
-    if (item == 0)
-      return true;
   }
 
   QString failname;
@@ -414,9 +410,37 @@ bool QJsonTreeWidget::checkRegExps(const QJsonTreeItem* item) const
     foreach (QJsonTreeItem* it, item->children())
     {
       // recurse
-      if (!checkRegExps(it))
+      if (!validateItems(it))
         return false;
     }
   }
   return true;
+}
+
+bool QJsonTreeWidget::findTag(const QString& tag, const QJsonTreeItem* item, QJsonTreeItem** found) const
+{
+  if (item == 0)
+  {
+    item = m_root;
+  }
+
+  if (item->map().contains(tag))
+  {
+    if (found)
+    {
+      *found = const_cast<QJsonTreeItem*>(item);
+    }
+    return true;
+  }
+
+  if (item->childCount() > 0)
+  {
+    foreach (QJsonTreeItem* it, item->children())
+    {
+      // recurse
+      if (findTag(tag,it,found))
+        return true;
+    }
+  }
+  return false;
 }
