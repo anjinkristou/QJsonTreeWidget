@@ -34,6 +34,7 @@ class QJsonTreeWidget;
 class QJsonTreeItemDelegate : public QStyledItemDelegate
 {
   friend class QJsonTreeModel;
+  friend class QJsonTreeItem;
 
   Q_OBJECT
 public:  

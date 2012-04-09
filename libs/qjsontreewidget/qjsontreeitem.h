@@ -21,12 +21,15 @@
 #define QJSONTREEITEM_H
 
 #include <QtCore>
+#include <QColor>
+#include <QFont>
 #include "qjsontree_global.h"
 
 class QJsonTreeModel;
 class QJsonTreeWidget;
 class QTreeView;
 class QJsonSortFilterProxyModel;
+class QJsonTreeItemDelegate;
 
 /**
  * @brief class to represent a tree item from a JSON object coming from QJsonTreeModel
@@ -37,6 +40,7 @@ class QJsonSortFilterProxyModel;
    friend class QJsonTreeModel;
    friend class QJsonTreeWidget;
    friend class QJsonSortFilterProxyModel;
+   friend class QJsonTreeItemDelegate;
 
    public:
 
@@ -57,7 +61,18 @@ class QJsonSortFilterProxyModel;
    enum SpecialFlag {
      HonorReadOnly = 1,
      HonorHide = 2,
-     ReadOnlyHidesRow = 4
+     ReadOnlyHidesRow = 4,
+     HonorItemBackgroundColor = 8,
+     HonorItemForegroundColor = 16,
+     HonorItemFont = 32,
+     HonorParentsBackgroundColor = 64,
+     HonorParentsForegroundColor = 128,
+     HonorParentsFont = 256,
+     HonorChildsBackgroundColor = 512,
+     HonorChildsForegroundColor = 1024,
+     HonorChildsFont = 2048,
+     HonorAll = HonorReadOnly | HonorHide | HonorItemBackgroundColor | HonorItemForegroundColor | HonorItemFont | HonorParentsBackgroundColor | HonorParentsForegroundColor | HonorParentsFont |
+      HonorChildsBackgroundColor | HonorChildsForegroundColor | HonorChildsFont
    };
    Q_DECLARE_FLAGS (SpecialFlags, SpecialFlag)
 
@@ -264,80 +279,6 @@ class QJsonSortFilterProxyModel;
    void clear();
 
    /**
-    * @brief returns header (column) displayed from the root item's header descriptor providing the column index
-    *
-    * @param column the column index
-    * @return const QString
-    */
-   const QString headerNameByIdx(int column) const;
-
-   /**
-    * @brief returns header (column) displayed name from the root item's header descriptor providing the corresponding JSON tag
-    *
-    * @param tag the column JSON tag
-    * @param column on return, the corresponding header index (optional)
-    * @return const QString
-    */
-   const QString headerNameByTag (const QString& tag, int* column=0) const;
-
-   /**
-    * @brief returns header (column) tag (= JSON tag) from the root item's header descriptor providing the column index
-    *
-    * @param column the column index
-    * @return const QString
-    */
-   const QString headerTagByIdx (int column) const;
-
-   /**
-    * @brief returns header (column) tag (= JSON tag) from the root item's header descriptor providing the header displayed name
-    *
-    * @param name the column displayed name
-    * @param column on return, the corresponding header index (optional)
-    * @return const QString
-    */
-   const QString headerTagByName (const QString& name, int* column=0) const;
-
-   /**
-    * @brief returns header (column) index from the root item's header descriptor providing the corresponding JSON tag
-    *
-    * @param tag the column JSON tag
-    * @return const QString
-    */
-   int headerIdxByTag(const QString &tag) const;
-
-   /**
-    * @brief returns header (column) index from the root item's header descriptor providing the header displayed name
-    *
-    * @param name the column displayed name
-    * @return const QString
-    */
-   int headerIdxByName(const QString &name) const;
-
-   /**
-    * @brief returns header (column) hash from the root item's header descriptor providing the column index
-    *
-    * @param column the column index
-    * @return const QHash<QString, QVariant>
-    */
-   const QHash<QString, QVariant> headerHashByIdx (int column) const { return m_headers.value(QVariant(column).toString(),QHash<QString,QVariant>()); }
-
-   /**
-    * @brief returns header (column) hash from the root item's header descriptor providing the corresponding JSON tag. due to the nature the hash is stored, this is equivalent to call headerHashByName()
-    *
-    * @param tag the column JSON tag
-    * @return const QHash<QString, QVariant>
-    */
-   const QHash<QString, QVariant> headerHashByTag (const QString& tag) const { return m_headers.value(tag,QHash<QString,QVariant>()); }
-
-   /**
-    * @brief returns header (column) hash from the root item's header descriptor providing the header displayed name. due to the nature the hash is stored, this is equivalent to call headerHashByTag()
-    *
-    * @param name the column displayed name
-    * @return const QHash<QString, QVariant>
-    */
-   const QHash<QString, QVariant> headerHashByName (const QString& name) const { return m_headers.value(name,QHash<QString,QVariant>()); }
-
-   /**
     * @brief returns the QJsonTreeWidget this item belongs to
     *
     * @return QJsonTreeWidget
@@ -363,6 +304,48 @@ class QJsonSortFilterProxyModel;
     */
    bool validateRegexp(QString* nonmatchingcol, QString* nonmatchingname, QString* nonmatchingval) const;
 
+   /**
+    * @brief sets the background color for the item
+    *
+    * @param color the color to be set
+    */
+   void setBackgroundColor(const QColor& color) { m_backgroundColor = color; }
+
+   /**
+    * @brief returns the background color set for the item, if any
+    *
+    * @return QColor
+    */
+   QColor backgroundColor() const { return m_backgroundColor; }
+
+   /**
+    * @brief sets the foreground color for the item
+    *
+    * @param color the color to be set
+    */
+   void setForegroundColor (const QColor& color) {m_foregroundColor = color; }
+
+   /**
+    * @brief returns the foreground color set for the item, if any
+    *
+    * @return QColor
+    */
+   QColor foregroundColor () const { return m_foregroundColor; }
+
+   /**
+    * @brief sets the font for the item. To clear the font set, pass a QFont with rawName = "_undef_"
+    *
+    * @param font the font to be set
+    */
+   void setFont (const QFont& font) { m_font = font; }
+
+   /**
+    * @brief returns the font set for the item, if any
+    *
+    * @return QFont
+    */
+   QFont font() const { return m_font; }
+
  protected:
    QJsonTreeModel* model();
    QTreeView *view();
@@ -373,6 +356,15 @@ class QJsonSortFilterProxyModel;
    bool setColumnHeaders(const QString &headers);
    const QString headerNameOrTagByString(const QString &name, bool returntag, int *column) const;
    const QString headerNameOrTagByInt(int column, bool returntag) const;
+   const QString headerNameByIdx(int column) const;
+   const QString headerNameByTag (const QString& tag, int* column=0) const;
+   const QString headerTagByIdx (int column) const;
+   const QString headerTagByName (const QString& name, int* column=0) const;
+   int headerIdxByTag(const QString &tag) const;
+   int headerIdxByName(const QString &name) const;
+   const QHash<QString, QVariant> headerHashByIdx (int column) const { return m_headers.value(QVariant(column).toString(),QHash<QString,QVariant>()); }
+   const QHash<QString, QVariant> headerHashByTag (const QString& tag) const { return m_headers.value(tag,QHash<QString,QVariant>()); }
+   const QHash<QString, QVariant> headerHashByName (const QString& name) const { return m_headers.value(name,QHash<QString,QVariant>()); }
    static QHash<QString, Qt::ItemFlags> widgetFlags;
    static QStringList descriptiveTags;
    QJsonTreeItem::JsonMapErrors m_error;
@@ -383,6 +375,9 @@ class QJsonSortFilterProxyModel;
    QJsonTreeItem* m_parent;
    QJsonTreeItem* m_root;
    QJsonTreeWidget* m_widget;
+   QColor m_backgroundColor;
+   QColor m_foregroundColor;
+   QFont m_font;
    int m_headersCount; // m_headers.count() to return number of columns wouldnt work, since how we store data in such hash
    int m_totalTreeItems;
 

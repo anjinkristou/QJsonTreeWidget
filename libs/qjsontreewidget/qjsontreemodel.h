@@ -41,16 +41,23 @@ public:
   /**
    * @brief constructor
    *
-   * @param root the root item
    * @param parent the parent object (optional)
+   * @param root the root item (optional)
    */
-  explicit QJsonTreeModel(QJsonTreeItem* root, QObject *parent = 0);
+  explicit QJsonTreeModel(QObject *parent = 0, QJsonTreeItem* root=0);
 
   /**
    * @brief destructor
    *
    */
   virtual ~QJsonTreeModel();
+
+  /**
+   * @brief sets the root item, invalidating the model (calls clear())
+   *
+   * @param root the root item
+   */
+  void setRoot(QJsonTreeItem* root) { this->clear(); m_root = root;}
 
   /**
    * @brief returns the root tree item (the whole tree itself), which is used only to store private data.
@@ -221,53 +228,43 @@ public:
    */
   const QModelIndex indexByItem(QJsonTreeItem *item, int column) const;
 
-  /**
-   * @brief influences how the model treats items with _hide_ and _readonly_ or any other special flags defined
-   *
-   * @param flags one or more QJsonTreeItem::SpecialFlags
-   */
+protected:
   void setSpecialFlags(QJsonTreeItem::SpecialFlags flags);
-
-  /**
-   * @brief returns the special flags set
-   *
-   * @return QJsonTreeItem::SpecialFlags
-   */
   QJsonTreeItem::SpecialFlags specialFlags() const { return m_specialFlags; }
 
-  /**
-   * @brief sets the color used to display parents
-   *
-   * @param color the color to be set
-   */
-  void setParentColor (const QColor& color) {m_parentColor = color; }
+  void setColumnBackgroundColor (const QString& tag, const QColor& color) { m_columnBackColors[tag] = color; }
+  QColor columnBackgroundColor (const QString& tag) const { return m_columnBackColors.value(tag,QColor()); }
+  void setColumnForegroundColor (const QString& tag, const QColor& color) { m_columnForeColors[tag] = color; }
+  QColor columnForegroundColor (const QString& tag) const { return m_columnForeColors.value(tag,QColor()); }
+  void setColumnFont (const QString& tag, const QFont& font) { m_columnFonts[tag] = font; }
+  QFont columnFont (const QString& tag) const { return m_columnFonts.value(tag,QFont()); }
 
-  /**
-   * @brief returns the color set for displaying parents
-   *
-   * @return QColor
-   */
-  QColor parentColor () const { return m_parentColor; }
+  void setParentsBackgroundColor (const QColor& color) {m_parentsBackColor = color;}
+  QColor parentsBackgroundColor () const { return m_parentsBackColor; }
+  void setParentsForegroundColor (const QColor& color) {m_parentsForeColor = color;}
+  QColor parentsForegroundColor () const { return m_parentsForeColor; }
+  void setParentsFont (const QFont& font) { m_parentsFont = font; }
+  QFont parentsFont () const { return m_parentsFont; }
 
-  /**
-   * @brief sets the color used to display childs
-   *
-   * @param color the color to be set
-   */
-  void setChildColor (const QColor& color) {m_childColor = color; }
-
-  /**
-   * @brief returns the color set for displaying childs
-   *
-   * @return QColor
-   */
-  QColor childColor () const { return m_childColor; }
+  void setChildsBackgroundColor (const QColor& color) {m_childsBackColor = color;}
+  QColor childsBackgroundColor () const { return m_childsBackColor; }
+  void setChildsForegroundColor (const QColor& color) {m_childsForeColor = color;}
+  QColor childsForegroundColor () const { return m_childsForeColor; }
+  void setChildsFont (const QFont& font) { m_childsFont = font; }
+  QFont childsFont () const { return m_childsFont; }
 
 private:
   QJsonTreeItem* parentItem(const QModelIndex& parent) const;
-  QColor m_parentColor;
-  QColor m_childColor;
   QJsonTreeItem* m_root;
+  QHash <QString, QColor> m_columnBackColors;
+  QHash <QString, QColor> m_columnForeColors;
+  QHash <QString, QFont> m_columnFonts;
+  QColor m_parentsForeColor;
+  QColor m_parentsBackColor;
+  QFont m_parentsFont;
+  QColor m_childsBackColor;
+  QColor m_childsForeColor;
+  QFont m_childsFont;
   QJsonTreeItem::SpecialFlags m_specialFlags;
 };
 

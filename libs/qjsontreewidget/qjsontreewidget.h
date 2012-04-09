@@ -360,33 +360,164 @@
    bool findTag(const QString& tag, const QJsonTreeItem *item = 0, QJsonTreeItem **found = 0) const;
 
    /**
-    * @brief sets the color used to display parents
+    * @brief enable animations when expanding/collapsing the widget
+    *
+    * @param enable to enable
+    */
+   void setAnimated(bool enable) { m_view->setAnimated(enable); }
+
+   /**
+    * @brief enable alternating row colors on the widget
+    *
+    * @param enable to enable
+    */
+   void setAlternatingRowColors (bool enable) { m_view->setAlternatingRowColors(enable); }
+
+   /**
+    * @brief returns whether alternating row colors is set
+    *
+    * @return bool
+    */
+   bool alternatingRowColors () const { return m_view->alternatingRowColors(); }
+
+   /**
+    * @brief hide the header in the widget
+    *
+    * @param hidden to hide
+    */
+   void setHeaderHidden (bool hidden) { m_view->setHeaderHidden(hidden); }
+
+   /**
+    * @brief sets the background color for the column. note: any color manually set on the item takes precedence.
+    *
+    * @param tag the column JSON tag
+    * @param color the color to be set
+    */
+   void setColumnBackgroundColor (const QString& tag, const QColor& color) { m_model->setColumnBackgroundColor(tag,color); }
+
+   /**
+    * @brief returns the background color for the column
+    *
+    * @param tag the column JSON tag
+    * @return QColor
+    */
+   QColor columnBackgroundColor (const QString& tag) const { return m_model->columnBackgroundColor(tag); }
+
+   /**
+    * @brief sets the foreground color for the column. note: any color manually set on the item takes precedence.
+    *
+    * @param tag the column JSON tag
+    * @param color the color to be set
+    */
+   void setColumnForegroundColor (const QString& tag, const QColor& color) { m_model->setColumnForegroundColor(tag,color); }
+
+   /**
+    * @brief returns the foreground color for the column
+    *
+    * @param tag the column JSON tag
+    * @return QColor
+    */
+   QColor columnForegroundColor (const QString& tag) const { return m_model->columnForegroundColor(tag); }
+
+   /**
+    * @brief sets the font for the column. note: any font manually set on the item takes precedence. To clear the font set, pass a QFont with rawName = "_undef_"
+    *
+    * @param tag the column JSON tag
+    * @param font the font to be set
+    */
+   void setColumnFont (const QString& tag, const QFont& font) { m_model->setColumnFont(tag,font); }
+
+   /**
+    * @brief returns the font for the column
+    *
+    * @param tag the column JSON tag
+    * @return QFont
+    */
+   QFont columnFont (const QString& tag) const { return m_model->columnFont(tag); }
+
+   /**
+    * @brief sets the background color for parent items. note: any color manually set on the item takes precedence.
     *
     * @param color the color to be set
     */
-   void setParentColor (const QColor& color) {if (m_model) m_model->setParentColor(color); }
+   void setParentsBackgroundColor (const QColor& color) {m_model->setParentsBackgroundColor(color);}
 
    /**
-    * @brief returns the color set for displaying parents
+    * @brief the background color for the parent items
     *
-    * @return QColor
+    * @returns QColor
     */
-   QColor parentColor () const { if (!m_model) return QColor(); return m_model->parentColor(); }
+   QColor parentsBackgroundColor () const { return m_model->parentsBackgroundColor(); }
 
    /**
-    * @brief sets the color used to display childs
+    * @brief sets the foreground color for parent items. note: any color manually set on the item takes precedence.
     *
     * @param color the color to be set
     */
-   void setChildColor (const QColor& color) {if (m_model) m_model->setChildColor(color); }
+   void setParentsForegroundColor (const QColor& color) {m_model->setParentsForegroundColor(color);}
 
    /**
-    * @brief returns the color set for displaying childs
+    * @brief the foreground color for the parent items
     *
-    * @return QColor
+    * @returns QColor
     */
-   QColor childColor () const { if (!m_model) return QColor(); return m_model->childColor(); }
+   QColor parentsForegroundColor () const { return m_model->parentsForegroundColor(); }
 
+   /**
+    * @brief sets the font for parent items. note: any font manually set on the item takes precedence. To clear the font set, pass a QFont with rawName = "_undef_"
+    *
+    * @param font the font to be set
+    */
+   void setParentsFont (const QFont& font) { m_model->setParentsFont(font); }
+
+   /**
+    * @brief the font for the parent items
+    *
+    * @returns QFont
+    */
+   QFont parentsFont () const { return m_model->parentsFont(); }
+
+   /**
+    * @brief sets the background color for child items. note: any color manually set on the item takes precedence.
+    *
+    * @param color the color to be set
+    */
+   void setChildsBackgroundColor (const QColor& color) {m_model->setChildsBackgroundColor(color);}
+
+   /**
+    * @brief the background color for the child items
+    *
+    * @returns QColor
+    */
+   QColor childsBackgroundColor () const { return m_model->childsBackgroundColor(); }
+
+   /**
+    * @brief sets the foreground color for child items. note: any color manually set on the item takes precedence.
+    *
+    * @param color the color to be set
+    */
+   void setChildsForegroundColor (const QColor& color) {m_model->setChildsForegroundColor(color);}
+
+   /**
+    * @brief the foreground color for the parent items
+    *
+    * @returns QColor
+    */
+   QColor childsForegroundColor () const { return m_model->childsForegroundColor(); }
+
+   /**
+    * @brief sets the font for child items. note: any font manually set on the item takes precedence. To clear the font set, pass a QFont with rawName = "_undef_"
+    *
+    * @param color the color to be set
+    */
+   void setChildsFont (const QFont& font) { m_model->setChildsFont(font); }
+
+   /**
+    * @brief the font for child items
+    *
+    * @returns QFont
+    */
+   QFont childsFont () const { return m_model->childsFont(); }
 
  signals:
    /**

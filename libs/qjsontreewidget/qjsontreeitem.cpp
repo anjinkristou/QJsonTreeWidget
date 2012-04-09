@@ -31,6 +31,10 @@ QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, cons
   m_parent = parent;
   m_widget = tree;
   m_map = map;
+  m_backgroundColor = QColor();
+  m_foregroundColor = QColor();
+  m_font = QFont();
+  m_font.setRawName("_undef_");
 
   // this is done only once
   if (QJsonTreeItem::widgetFlags.isEmpty())
@@ -106,7 +110,6 @@ bool QJsonTreeItem::fromMap(const QVariantMap &map, QJsonTreeItem *parent,bool i
 
 QJsonTreeItem::~QJsonTreeItem()
 {
-  qDebug() << "~QJsonTreeItem()";
   this->clear();
 }
 

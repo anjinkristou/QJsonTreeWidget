@@ -19,16 +19,25 @@
 
 #include "qjsontreemodel.h"
 
-QJsonTreeModel::QJsonTreeModel(QJsonTreeItem* root, QObject *parent) :
+QJsonTreeModel::QJsonTreeModel(QObject *parent, QJsonTreeItem* root) :
   QAbstractItemModel(parent)
 {
-  m_specialFlags = (QJsonTreeItem::HonorReadOnly | QJsonTreeItem::HonorHide);
+  m_specialFlags = QJsonTreeItem::HonorAll;
+  m_childsFont = QFont();
+  m_childsFont.setRawName("_undef_");
+  m_childsForeColor = QColor();
+  m_childsBackColor = QColor();
+  m_parentsFont = QFont();
+  m_parentsFont.setRawName("_undef_");
+  m_parentsForeColor = QColor();
+  m_parentsBackColor = QColor();
+
   m_root = root;
 }
 
 QJsonTreeModel::~QJsonTreeModel()
 {
-  qDebug() << "~QJsonTreeModel()";
+  qDebug() << "QJsonTreeModel()";
   this->clear();
 }
 
@@ -127,32 +136,81 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
   if (tag.isEmpty())
     return QVariant();
 
-  // check color
-  if (role == Qt::ForegroundRole)
+  // check roles
+  switch (role)
   {
-    // read only should be always displayed as disabled
-    QString rotag ("_readonly_:" % tag);
-    if (item->map().contains(rotag))
-      return QVariant();
+    case Qt::ForegroundRole:
+      // read only should be always displayed as disabled
+      if (item->map().contains("_readonly_:" % tag))
+        return QVariant();
 
-    if (item->hasChildren())
-    {
-      // its a parent
-      if (!m_parentColor.isValid())
+      // item color has precedence
+      if (item->foregroundColor().isValid() && (m_specialFlags & QJsonTreeItem::HonorItemForegroundColor))
+        return QVariant(item->foregroundColor());
+
+      // check parent/child color then
+      if (item->hasChildren())
       {
-        return QVariant();
+        if (m_parentsForeColor.isValid() && (m_specialFlags & QJsonTreeItem::HonorParentsForegroundColor))
+          return QVariant(m_parentsForeColor);
       }
-      return QVariant(m_parentColor);
-    }
-    else
-    {
-      // its a child
-      if (!m_childColor.isValid())
+      else
       {
-        return QVariant();
+        if (m_childsForeColor.isValid() && (m_specialFlags & QJsonTreeItem::HonorChildsForegroundColor))
+          return QVariant(m_childsForeColor);
       }
-      return QVariant(m_childColor);
-    }
+
+      // then the column color
+      if (columnForegroundColor(tag).isValid())
+        return QVariant(columnForegroundColor(tag));
+      return QVariant();
+    break;
+
+    case Qt::BackgroundRole:
+      // item color has precedence
+      if (item->backgroundColor().isValid() && (m_specialFlags & QJsonTreeItem::HonorItemBackgroundColor))
+        return QVariant(item->backgroundColor());
+
+      // check parent/child color then
+      if (item->hasChildren())
+      {
+        if (m_parentsBackColor.isValid() && (m_specialFlags & QJsonTreeItem::HonorParentsBackgroundColor))
+          return QVariant(m_parentsBackColor);
+      }
+      else
+      {
+        if (m_childsBackColor.isValid() && (m_specialFlags & QJsonTreeItem::HonorChildsBackgroundColor))
+          return QVariant(m_childsBackColor);
+      }
+
+      // then the column color
+      if (columnBackgroundColor(tag).isValid())
+        return QVariant(columnBackgroundColor(tag));
+      return QVariant();
+    break;
+
+    case Qt::FontRole:
+      // item font has precedence
+      if (!item->font().rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorItemFont))
+        return QVariant(item->font());
+
+      // check parent/child font then
+      if (item->hasChildren())
+      {
+        if (!m_parentsFont.rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorChildsFont))
+          return QVariant(m_parentsFont);
+      }
+      else
+      {
+        if (!m_childsFont.rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorChildsFont))
+          return QVariant(m_childsFont);
+      }
+
+      return QVariant(columnFont(tag));
+    break;
+
+    default:
+      break;
   }
 
   // skip custom drawn items (they could be buttons, they have usually no values... maybe we could change that later)
@@ -213,6 +271,9 @@ Qt::ItemFlags QJsonTreeModel::flags(const QModelIndex &index) const
 
 QVariant QJsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+  if (!m_root)
+    return QVariant();
+
   if (role == Qt::DisplayRole)
     return m_root->headerNameByIdx(section);
   return QVariant();
@@ -287,7 +348,6 @@ void QJsonTreeModel::clear()
     delete m_root;
     m_root = 0;
   }
-  m_specialFlags = (QJsonTreeItem::HonorReadOnly | QJsonTreeItem::HonorHide);
   endResetModel();
 }
 
@@ -302,7 +362,9 @@ void QJsonTreeModel::setSpecialFlags(QJsonTreeItem::SpecialFlags flags)
 QJsonTreeItem *QJsonTreeModel::itemByModelIndex(const QModelIndex &index, int role) const
 {
   // check if index is valid and one of these roles is requested
-  if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ForegroundRole && role != Qt::ToolTipRole))
+  QList <int> roles;
+  roles << Qt::DisplayRole << Qt::EditRole << Qt::FontRole << Qt::BackgroundRole << Qt::ForegroundRole << Qt::ToolTipRole;
+  if (!index.isValid() || !roles.contains(role))
     return 0;
 
   // get item

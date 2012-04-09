@@ -39,11 +39,13 @@ void Dialog::loadCfg(const QString &fname)
   m_qjsw->setStretchLastSection(false);
   m_qjsw->setLoadFromFileEnabled(true);
   m_qjsw->setSortingEnabled(true);
-  /*m_qjsw->setPurgeDescriptiveTagsOnSave(true);
-  QHash <QString, bool> h;
-  h["_template_"] = true;
-  m_qjsw->setPurgeListOnSave(h);
-  */
+  m_qjsw->setColumnForegroundColor("_desc_",QApplication::style()->standardPalette().mid().color());
+  QFont f;
+  f.setItalic(true);
+  m_qjsw->setColumnFont("_desc_",f);
+  f.setBold(true);
+  f.setItalic(false);
+  m_qjsw->setParentsFont(f);
   m_lastLoaded = fname;
 }
 

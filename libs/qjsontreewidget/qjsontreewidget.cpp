@@ -23,11 +23,10 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   QWidget(parent,f)
 {
   m_maxVersion = JSON_TREE_MAX_VERSION;
-  m_model = 0;
-  m_proxyModel = 0;
   m_currentSelection = QModelIndex();
   m_editing = true;
   m_purgeDescriptiveTags = false;
+  m_root = 0;
 
   // create qjson objects
   m_parser = new QJson::Parser();
@@ -39,8 +38,6 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   m_view = new QTreeView(this);
   m_view->setHeaderHidden(false);
   m_view->setSortingEnabled(false);
-  m_view->setAnimated(true);
-  m_view->setAlternatingRowColors(true);
   l->addWidget(m_view);
 
   // add an optional layout for the user to put its controls in
@@ -76,6 +73,13 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
 
   // various options
   this->setContextMenuPolicy(Qt::CustomContextMenu);
+
+  // create the model and proxy
+  m_model = new QJsonTreeModel(this);
+  connect (m_model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(onDataChanged(QModelIndex,QModelIndex)));
+  m_proxyModel = new QJsonSortFilterProxyModel(this);
+  m_proxyModel->setDynamicSortFilter(true);
+  m_view->setModel(m_proxyModel);
 }
 
 QJsonTreeWidget::~QJsonTreeWidget()
@@ -182,8 +186,7 @@ void QJsonTreeWidget::clear()
 {
   m_purgeList.clear();
   m_purgeDescriptiveTags = false;
-  if (m_model)
-    m_model->clear();
+  m_model->clear();
 }
 
 void QJsonTreeWidget::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
@@ -303,22 +306,12 @@ bool QJsonTreeWidget::loadJsonInternal(const QVariantMap& map)
     this->clear();
     return false;
   }
-
   m_root->appendChild(r);
 
-  // create the model and proxy
-  if (m_model)
-    delete m_model;
-  if (m_proxyModel)
-    delete m_proxyModel;
-
-  m_model = new QJsonTreeModel(m_root,this);
-  connect (m_model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(onDataChanged(QModelIndex,QModelIndex)));
-  m_proxyModel = new QJsonSortFilterProxyModel(this);
-  m_proxyModel->setDynamicSortFilter(true);
+  m_model->setRoot(m_root);
   m_proxyModel->setSourceModel(m_model);
-  m_view->setModel(m_proxyModel);
   return true;
+
 }
 
 void QJsonTreeWidget::setSortingEnabled(bool enable)
