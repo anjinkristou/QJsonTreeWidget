@@ -24,11 +24,11 @@ QJsonTreeModel::QJsonTreeModel(QObject *parent, QJsonTreeItem* root) :
 {
   m_specialFlags = QJsonTreeItem::HonorAll;
   m_childsFont = QFont();
-  m_childsFont.setRawName("_undef_");
+  m_childsFontValid = false;
   m_childsForeColor = QColor();
   m_childsBackColor = QColor();
   m_parentsFont = QFont();
-  m_parentsFont.setRawName("_undef_");
+  m_parentsFontValid = false;
   m_parentsForeColor = QColor();
   m_parentsBackColor = QColor();
 
@@ -37,7 +37,6 @@ QJsonTreeModel::QJsonTreeModel(QObject *parent, QJsonTreeItem* root) :
 
 QJsonTreeModel::~QJsonTreeModel()
 {
-  qDebug() << "QJsonTreeModel()";
   this->clear();
 }
 
@@ -191,23 +190,27 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
 
     case Qt::FontRole:
       // item font has precedence
-      if (!item->font().rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorItemFont))
+      if (item->isFontValid() && (m_specialFlags & QJsonTreeItem::HonorItemFont))
         return QVariant(item->font());
 
+      // check parent/child font then
       if (item->isTree() || item->hasChildren())
       {
-        if (!m_parentsFont.rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorParentsFont))
+        if (m_parentsFontValid && (m_specialFlags & QJsonTreeItem::HonorParentsFont))
           return QVariant(m_parentsFont);
       }
       else
       {
-        if (!m_childsFont.rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorChildsFont))
+        if (m_childsFontValid && (m_specialFlags & QJsonTreeItem::HonorChildsFont))
           return QVariant(m_childsFont);
       }
 
+      // then the column font
       if (!(m_specialFlags & QJsonTreeItem::HonorColumnFont))
         return QVariant();
-      return QVariant(columnFont(tag));
+      if (m_columnFonts.value(tag % ":valid",false).toBool())
+        return QVariant(columnFont(tag));
+      return QVariant();
     break;
 
     default:

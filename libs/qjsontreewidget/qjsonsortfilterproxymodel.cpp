@@ -25,7 +25,6 @@ QJsonSortFilterProxyModel::QJsonSortFilterProxyModel(QObject *parent) :
 
 QJsonSortFilterProxyModel::~QJsonSortFilterProxyModel()
 {
-  qDebug() << "QJsonSortFilterProxyModel()";
 }
 
 bool QJsonSortFilterProxyModel::filterAcceptsRow ( int source_row, const QModelIndex & source_parent ) const

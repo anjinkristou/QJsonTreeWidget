@@ -336,11 +336,11 @@ class QJsonTreeItemDelegate;
    QColor foregroundColor () const { return m_foregroundColor; }
 
    /**
-    * @brief sets the font for the item. To clear the font set, pass a QFont with rawName = "_undef_"
+    * @brief sets the font for the item
     *
     * @param font the font to be set
     */
-   void setFont (const QFont& font) { m_font = font; }
+   void setFont (const QFont& font) { m_font = font; m_fontValid = true;}
 
    /**
     * @brief returns the font set for the item, if any
@@ -354,7 +354,14 @@ class QJsonTreeItemDelegate;
     *
     * @return bool
     */
-   bool isTree();
+   bool isTree() const;
+
+   /**
+    * @brief returns if the item has an initialized font set
+    *
+    * @return bool
+    */
+   bool isFontValid() const { return m_fontValid; }
 
  protected:
    QJsonTreeModel* model();
@@ -388,6 +395,7 @@ class QJsonTreeItemDelegate;
    QColor m_backgroundColor;
    QColor m_foregroundColor;
    QFont m_font;
+   bool m_fontValid;
    int m_headersCount; // m_headers.count() to return number of columns wouldnt work, since how we store data in such hash
    int m_totalTreeItems;
    QHash<QString, QHash<QString, QVariant> > m_headers;

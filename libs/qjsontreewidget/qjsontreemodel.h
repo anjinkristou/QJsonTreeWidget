@@ -232,39 +232,43 @@ protected:
   void setSpecialFlags(QJsonTreeItem::SpecialFlags flags);
   QJsonTreeItem::SpecialFlags specialFlags() const { return m_specialFlags; }
 
+private:
+
   void setColumnBackgroundColor (const QString& tag, const QColor& color) { m_columnBackColors[tag] = color; }
   QColor columnBackgroundColor (const QString& tag) const { return m_columnBackColors.value(tag,QColor()); }
   void setColumnForegroundColor (const QString& tag, const QColor& color) { m_columnForeColors[tag] = color; }
   QColor columnForegroundColor (const QString& tag) const { return m_columnForeColors.value(tag,QColor()); }
-  void setColumnFont (const QString& tag, const QFont& font) { m_columnFonts[tag] = font; }
-  QFont columnFont (const QString& tag) const { return m_columnFonts.value(tag,QFont()); }
+  void setColumnFont (const QString& tag, const QFont& font) { m_columnFonts[tag] = font.toString(); m_columnFonts[tag % ":valid"]=true;}
+  QFont columnFont (const QString& tag) const { QFont f = QFont(); f.fromString(m_columnFonts.value(tag,QString()).toString()); return f; }
 
   void setParentsBackgroundColor (const QColor& color) {m_parentsBackColor = color;}
   QColor parentsBackgroundColor () const { return m_parentsBackColor; }
   void setParentsForegroundColor (const QColor& color) {m_parentsForeColor = color;}
   QColor parentsForegroundColor () const { return m_parentsForeColor; }
-  void setParentsFont (const QFont& font) { m_parentsFont = font; }
+  void setParentsFont (const QFont& font) { m_parentsFont = font; m_parentsFontValid = true;}
   QFont parentsFont () const { return m_parentsFont; }
 
   void setChildsBackgroundColor (const QColor& color) {m_childsBackColor = color;}
   QColor childsBackgroundColor () const { return m_childsBackColor; }
   void setChildsForegroundColor (const QColor& color) {m_childsForeColor = color;}
   QColor childsForegroundColor () const { return m_childsForeColor; }
-  void setChildsFont (const QFont& font) { m_childsFont = font; }
+  void setChildsFont (const QFont& font) { m_childsFont = font; m_childsFontValid = true;}
   QFont childsFont () const { return m_childsFont; }
 
-private:
   QJsonTreeItem* parentItem(const QModelIndex& parent) const;
+
   QJsonTreeItem* m_root;
   QHash <QString, QColor> m_columnBackColors;
   QHash <QString, QColor> m_columnForeColors;
-  QHash <QString, QFont> m_columnFonts;
+  QVariantMap m_columnFonts;
   QColor m_parentsForeColor;
   QColor m_parentsBackColor;
   QFont m_parentsFont;
+  bool m_parentsFontValid;
   QColor m_childsBackColor;
   QColor m_childsForeColor;
   QFont m_childsFont;
+  bool m_childsFontValid;
   QJsonTreeItem::SpecialFlags m_specialFlags;
 };
 

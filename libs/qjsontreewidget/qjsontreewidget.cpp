@@ -84,7 +84,6 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
 
 QJsonTreeWidget::~QJsonTreeWidget()
 {
-  qDebug() << "~QJsonTreeWidget()";
   this->clear();
 }
 

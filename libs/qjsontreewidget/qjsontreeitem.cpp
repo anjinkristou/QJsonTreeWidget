@@ -34,7 +34,7 @@ QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, cons
   m_backgroundColor = QColor();
   m_foregroundColor = QColor();
   m_font = QFont();
-  m_font.setRawName("_undef_");
+  m_fontValid = false;
   m_children = QList<QJsonTreeItem*>();
 
   // this is done only once
@@ -265,7 +265,7 @@ bool QJsonTreeItem::validateRegexp(QString* nonmatchingcol, QString* nonmatching
   return true;
 }
 
-bool QJsonTreeItem::isTree()
+bool QJsonTreeItem::isTree() const
 {
   foreach (QString k, m_map.keys())
   {

@@ -420,7 +420,7 @@
    QColor columnForegroundColor (const QString& tag) const { return m_model->columnForegroundColor(tag); }
 
    /**
-    * @brief sets the font for the column. note: any font manually set on the item takes precedence. To clear the font set, pass a QFont with rawName = "_undef_"
+    * @brief sets the font for the column. note: any font manually set on the item takes precedence
     *
     * @param tag the column JSON tag
     * @param font the font to be set
@@ -464,7 +464,7 @@
    QColor parentsForegroundColor () const { return m_model->parentsForegroundColor(); }
 
    /**
-    * @brief sets the font for parent items. note: any font manually set on the item takes precedence. To clear the font set, pass a QFont with rawName = "_undef_"
+    * @brief sets the font for parent items. note: any font manually set on the item takes precedence
     *
     * @param font the font to be set
     */
@@ -506,11 +506,11 @@
    QColor childsForegroundColor () const { return m_model->childsForegroundColor(); }
 
    /**
-    * @brief sets the font for child items. note: any font manually set on the item takes precedence. To clear the font set, pass a QFont with rawName = "_undef_"
+    * @brief sets the font for child items. note: any font manually set on the item takes precedence
     *
     * @param color the color to be set
     */
-   void setChildsFont (const QFont& font) { m_model->setChildsFont(font); }
+   void setChildsFont (const QFont& font) { m_model->setChildsFont(font);}
 
    /**
     * @brief the font for child items

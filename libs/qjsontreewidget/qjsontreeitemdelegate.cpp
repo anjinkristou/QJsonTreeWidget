@@ -29,7 +29,6 @@ QJsonTreeItemDelegate::QJsonTreeItemDelegate(QObject *parent) :
 
 QJsonTreeItemDelegate::~QJsonTreeItemDelegate()
 {
-  qDebug() << "~QJsonTreeItemDelegate()";
 }
 
 QWidget *QJsonTreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
