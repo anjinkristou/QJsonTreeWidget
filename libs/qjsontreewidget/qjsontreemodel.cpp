@@ -149,7 +149,7 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
         return QVariant(item->foregroundColor());
 
       // check parent/child color then
-      if (item->hasChildren())
+      if (item->isTree() || item->hasChildren())
       {
         if (m_parentsForeColor.isValid() && (m_specialFlags & QJsonTreeItem::HonorParentsForegroundColor))
           return QVariant(m_parentsForeColor);
@@ -172,7 +172,7 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
         return QVariant(item->backgroundColor());
 
       // check parent/child color then
-      if (item->hasChildren())
+      if (item->isTree() || item->hasChildren())
       {
         if (m_parentsBackColor.isValid() && (m_specialFlags & QJsonTreeItem::HonorParentsBackgroundColor))
           return QVariant(m_parentsBackColor);
@@ -195,7 +195,12 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
         return QVariant(item->font());
 
       // check parent/child font then
-      if (item->hasChildren())
+      if (tag.compare("name")==0 && item->map()[tag].toString().contains("sysinfo"))
+      {
+        int q = 0;
+        q++;
+      }
+      if (item->isTree() || item->hasChildren())
       {
         if (!m_parentsFont.rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorChildsFont))
           return QVariant(m_parentsFont);

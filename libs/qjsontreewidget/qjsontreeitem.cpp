@@ -35,6 +35,7 @@ QJsonTreeItem::QJsonTreeItem (QJsonTreeWidget* tree, QJsonTreeItem *parent, cons
   m_foregroundColor = QColor();
   m_font = QFont();
   m_font.setRawName("_undef_");
+  m_children = QList<QJsonTreeItem*>();
 
   // this is done only once
   if (QJsonTreeItem::widgetFlags.isEmpty())
@@ -262,6 +263,19 @@ bool QJsonTreeItem::validateRegexp(QString* nonmatchingcol, QString* nonmatching
     }
   }
   return true;
+}
+
+bool QJsonTreeItem::isTree()
+{
+  foreach (QString k, m_map.keys())
+  {
+    if (k.contains("_widget_:"))
+    {
+      if (m_map[k].toString().compare("Tree",Qt::CaseInsensitive) == 0)
+        return true;
+    }
+  }
+  return false;
 }
 
 int QJsonTreeItem::row() const

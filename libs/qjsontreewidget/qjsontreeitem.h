@@ -346,6 +346,13 @@ class QJsonTreeItemDelegate;
     */
    QFont font() const { return m_font; }
 
+   /**
+    * @brief use this instead of hasChildren
+    *
+    * @return bool
+    */
+   bool isTree();
+
  protected:
    QJsonTreeModel* model();
    QTreeView *view();

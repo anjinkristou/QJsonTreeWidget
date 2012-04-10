@@ -16,7 +16,8 @@ Usage is really simple, you just have to adopt this format for your tree:
   the optional <draw> parameter is for columns where you need a custom painted widget (not an editor), such as a button.
 
 . each leaf can have one or more widgets to be displayed, actually QJsonTreeWidget supports, as editors, 
-  QLineEdit, QSpinBox, QCheckBox and QComboBox. As static widgets, QPushButton. 
+  QLineEdit, QSpinBox, QCheckBox and QComboBox. As static widgets, QPushButton.
+  subtrees having not having "_children_" (empty parents) should have a "_widget_:something": "Tree" set, to recognize them as parents. 
   
   format is i.e. "_widget_:JSONtag": "QLineEdit", which displays a QLineEdit for the JSON node named <JSONTag>.
 
