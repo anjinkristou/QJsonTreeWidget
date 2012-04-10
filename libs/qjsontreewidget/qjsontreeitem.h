@@ -347,7 +347,7 @@ class QJsonTreeItemDelegate;
    QFont font() const { return m_font; }
 
    /**
-    * @brief use this instead of hasChildren
+    * @brief use this instead of hasChildren, for parents with no childrens
     *
     * @return bool
     */
