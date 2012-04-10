@@ -71,8 +71,11 @@ class QJsonTreeItemDelegate;
      HonorChildsBackgroundColor = 512,
      HonorChildsForegroundColor = 1024,
      HonorChildsFont = 2048,
+     HonorColumnBackgroundColor = 4096,
+     HonorColumnForegroundColor = 8192,
+     HonorColumnFont = 16384,
      HonorAll = HonorReadOnly | HonorHide | HonorItemBackgroundColor | HonorItemForegroundColor | HonorItemFont | HonorParentsBackgroundColor | HonorParentsForegroundColor | HonorParentsFont |
-      HonorChildsBackgroundColor | HonorChildsForegroundColor | HonorChildsFont
+      HonorChildsBackgroundColor | HonorChildsForegroundColor | HonorChildsFont | HonorColumnBackgroundColor | HonorColumnForegroundColor | HonorColumnFont
    };
    Q_DECLARE_FLAGS (SpecialFlags, SpecialFlag)
 
@@ -387,7 +390,6 @@ class QJsonTreeItemDelegate;
    QFont m_font;
    int m_headersCount; // m_headers.count() to return number of columns wouldnt work, since how we store data in such hash
    int m_totalTreeItems;
-
    QHash<QString, QHash<QString, QVariant> > m_headers;
  };
 

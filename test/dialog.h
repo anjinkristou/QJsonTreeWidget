@@ -31,6 +31,18 @@ namespace Ui {
 
    void onTreeButtonClicked(const QJsonTreeItem* item, const QString& jsontag);
    void on_searchButton_clicked();
+   void on_honorChildFontCheckbox_toggled(bool checked);
+   void on_honorParentFontCheckbox_toggled(bool checked);
+   void on_honorChildFgColorCheckBox_toggled(bool checked);
+   void on_honorChildBgColorCheckBox_toggled(bool checked);
+   void on_honorParentBgColorCheckBox_toggled(bool checked);
+   void on_honorParentFgColorCheckBox_toggled(bool checked);
+   void on_honorItemBgColorCheckBox_toggled(bool checked);
+   void on_honorItemFgColorCheckBox_toggled(bool checked);
+   void on_honorItemFontCheckBox_toggled(bool checked);
+   void on_honorColumnFontCheckBox_toggled(bool checked);
+   void on_honorColumnFgColorCheckBox_toggled(bool checked);
+   void on_honorColumnBgColorCheckBox_toggled(bool checked);
  };
 
 #endif // DIALOG_H

@@ -96,3 +96,77 @@ void Dialog::on_searchButton_clicked()
 {
   m_qjsw->search(ui->searchLineEdit->text());
 }
+
+void Dialog::on_honorChildFontCheckbox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorChildsFont)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorChildsFont));
+}
+
+void Dialog::on_honorParentFontCheckbox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorParentsFont)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorParentsFont));
+}
+
+void Dialog::on_honorChildFgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorChildsForegroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorChildsForegroundColor));
+}
+
+void Dialog::on_honorChildBgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorChildsBackgroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorChildsBackgroundColor));
+}
+
+void Dialog::on_honorParentBgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorParentsBackgroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorParentsBackgroundColor));
+}
+
+void Dialog::on_honorParentFgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorParentsForegroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorParentsForegroundColor));
+}
+
+void Dialog::on_honorItemBgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorItemBackgroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorItemBackgroundColor));
+}
+
+void Dialog::on_honorItemFgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorItemForegroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorItemForegroundColor));
+}
+
+void Dialog::on_honorItemFontCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorItemFont)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorItemFont));
+}
+
+void Dialog::on_honorColumnFontCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorColumnFont)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorColumnFont));
+}
+
+void Dialog::on_honorColumnFgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorColumnForegroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorColumnForegroundColor));
+
+}
+
+void Dialog::on_honorColumnBgColorCheckBox_toggled(bool checked)
+{
+  checked ? (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() | QJsonTreeItem::HonorColumnBackgroundColor)) :
+    (m_qjsw->setSpecialFlags(m_qjsw->specialFlags() & ~QJsonTreeItem::HonorColumnBackgroundColor));
+
+}

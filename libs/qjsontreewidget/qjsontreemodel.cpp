@@ -161,7 +161,7 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
       }
 
       // then the column color
-      if (columnForegroundColor(tag).isValid())
+      if (columnForegroundColor(tag).isValid()  && (m_specialFlags & QJsonTreeItem::HonorColumnForegroundColor))
         return QVariant(columnForegroundColor(tag));
       return QVariant();
     break;
@@ -184,7 +184,7 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
       }
 
       // then the column color
-      if (columnBackgroundColor(tag).isValid())
+      if (columnBackgroundColor(tag).isValid() && (m_specialFlags & QJsonTreeItem::HonorColumnBackgroundColor))
         return QVariant(columnBackgroundColor(tag));
       return QVariant();
     break;
@@ -194,15 +194,9 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
       if (!item->font().rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorItemFont))
         return QVariant(item->font());
 
-      // check parent/child font then
-      if (tag.compare("name")==0 && item->map()[tag].toString().contains("sysinfo"))
-      {
-        int q = 0;
-        q++;
-      }
       if (item->isTree() || item->hasChildren())
       {
-        if (!m_parentsFont.rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorChildsFont))
+        if (!m_parentsFont.rawName().compare("_undef_",Qt::CaseInsensitive) == 0 && (m_specialFlags & QJsonTreeItem::HonorParentsFont))
           return QVariant(m_parentsFont);
       }
       else
@@ -211,6 +205,8 @@ QVariant QJsonTreeModel::data(const QModelIndex &index, int role) const
           return QVariant(m_childsFont);
       }
 
+      if (!(m_specialFlags & QJsonTreeItem::HonorColumnFont))
+        return QVariant();
       return QVariant(columnFont(tag));
     break;
 

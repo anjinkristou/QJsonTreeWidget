@@ -15,31 +15,155 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QCheckBox" name="honorReadOnlyCheckBox">
-     <property name="text">
-      <string>Honor readonly</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="honorHideCheckBox">
-     <property name="text">
-      <string>Honor hide</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="treatROAsHideCheckBox">
-     <property name="text">
-      <string>Treat readonly as 'hide whole row'</string>
-     </property>
-    </widget>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="honorChildBgColorCheckBox">
+       <property name="text">
+        <string>Honor child background color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="honorChildFgColorCheckBox">
+       <property name="text">
+        <string>Honor child foreground color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="honorChildFontCheckbox">
+       <property name="text">
+        <string>Honor child font</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="honorParentBgColorCheckBox">
+       <property name="text">
+        <string>Honor parent background color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="honorParentFgColorCheckBox">
+       <property name="text">
+        <string>Honor parent foreground color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QCheckBox" name="honorParentFontCheckbox">
+       <property name="text">
+        <string>Honor parent font</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QCheckBox" name="treatROAsHideCheckBox">
+       <property name="text">
+        <string>Treat readonly as 'hide whole row'</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QCheckBox" name="honorHideCheckBox">
+       <property name="text">
+        <string>Honor hide</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QCheckBox" name="honorReadOnlyCheckBox">
+       <property name="text">
+        <string>Honor readonly</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="honorItemBgColorCheckBox">
+       <property name="text">
+        <string>Honor item background color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QCheckBox" name="honorItemFgColorCheckBox">
+       <property name="text">
+        <string>Honor item foreground color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QCheckBox" name="honorItemFontCheckBox">
+       <property name="text">
+        <string>Honor item font</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="honorColumnBgColorCheckBox">
+       <property name="text">
+        <string>Honor column background color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="honorColumnFgColorCheckBox">
+       <property name="text">
+        <string>Honor column foreground color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QCheckBox" name="honorColumnFontCheckBox">
+       <property name="text">
+        <string>Honor column font</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
