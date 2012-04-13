@@ -528,8 +528,6 @@ void QJsonTreeWidget::toHtmlInternal(QXmlStreamWriter* str, const QJsonTreeItem*
   for (int i=0; i < item->columnCount(); i++)
   {
     QString s = item->map().value(item->headerTagByIdx(i),QString()).toString();
-    if (s.isEmpty())
-      continue;
 
     str->writeStartElement("td");
     if (item->hasChildren())
@@ -583,6 +581,18 @@ bool QJsonTreeWidget::toHtmlFile(const QString &path, const QString &title, cons
   f.write(s.toLatin1());
   f.close();
   return true;
+}
+
+void QJsonTreeWidget::setHeaderMenuEnabled(bool enable)
+{
+  if (enable)
+  {
+    m_view->header()->setContextMenuPolicy(Qt::ActionsContextMenu);
+  }
+  else
+  {
+    m_view->header()->setContextMenuPolicy(Qt::NoContextMenu);
+  }
 }
 
 QString QJsonTreeWidget::toHtml(const QString &title, const QHash<QString,QString> div, const QJsonTreeItem *item) const

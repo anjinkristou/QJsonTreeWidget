@@ -67,7 +67,7 @@
    QGridLayout* optLayout() const { return m_optLayout; }
 
    /**
-    * @brief returns detailed error
+   * @brief returns detailed error
     *
     * @return const QString
     */
@@ -540,6 +540,13 @@
     */
    bool toHtmlFile(const QString& path, const QString& title = QString(), const QHash<QString,QString> div = QHash<QString,QString>(), const QJsonTreeItem* item = 0) const;
 
+   /**
+    * @brief enables the menu (load/save/sort/savehtml) activated by rightclicking on the header
+    *
+    * @param enable enable menu
+    */
+   void setHeaderMenuEnabled(bool enable);
+
  signals:
    /**
     * @brief connect to this signal to be notified of generic mouseclicks on the view
@@ -601,6 +608,7 @@
    QHash<QString,bool> m_purgeList;
    bool m_purgeDescriptiveTags;
    bool m_editing;
+   bool m_enableHdrMenu;
    int m_maxVersion;
  };
 
