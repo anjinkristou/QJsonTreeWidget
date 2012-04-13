@@ -278,6 +278,18 @@ bool QJsonTreeItem::isTree() const
   return false;
 }
 
+int QJsonTreeItem::depth() const
+{
+  int d = 0;
+  const QJsonTreeItem* it = this;
+  while (it->hasParent())
+  {
+    d++;
+    it = it->parent();
+  }
+  return d;
+}
+
 int QJsonTreeItem::row() const
 {
   // if there's a parent item, this item's corresponding row is taken from the childs index of its parent. either, its the 1st row (row 0, this is a parent item)

@@ -363,6 +363,13 @@ class QJsonTreeItemDelegate;
     */
    bool isFontValid() const { return m_fontValid; }
 
+   /**
+    * @brief returns the item depth (0 for parents)
+    *
+    * @return int
+    */
+   int depth() const;
+
  protected:
    QJsonTreeModel* model();
    QTreeView *view();

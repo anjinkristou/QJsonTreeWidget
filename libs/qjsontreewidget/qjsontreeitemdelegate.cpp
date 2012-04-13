@@ -33,6 +33,8 @@ QJsonTreeItemDelegate::~QJsonTreeItemDelegate()
 
 QWidget *QJsonTreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+  Q_UNUSED(option);
+
   QModelIndex idx = QJsonSortFilterProxyModel::indexToSourceIndex(index);
   const QJsonTreeModel* model = static_cast<const QJsonTreeModel*>(idx.model());
 
@@ -227,11 +229,15 @@ void QJsonTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
 void QJsonTreeItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+  Q_UNUSED(index);
   editor->setGeometry(option.rect);
 }
 
 bool QJsonTreeItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
+  Q_UNUSED(model);
+  Q_UNUSED(option);
+
   QMouseEvent* me;
 
   switch (event->type())

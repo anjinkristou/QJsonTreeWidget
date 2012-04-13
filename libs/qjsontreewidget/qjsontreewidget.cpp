@@ -52,19 +52,22 @@ QJsonTreeWidget::QJsonTreeWidget(QWidget *parent, Qt::WindowFlags f) :
   m_view->setSelectionBehavior(QAbstractItemView::SelectItems);
   m_actionEnableSort = new QAction(tr("Enable sorting"),m_view);
   m_actionDisableSort = new QAction(tr("Disable sorting"),m_view);
-  m_actionLoad = new QAction(tr("Load from file"),m_view);
-  m_actionSave = new QAction(tr("Save to file"),m_view);
+  m_actionLoad = new QAction(tr("Load from JSON file"),m_view);
+  m_actionSave = new QAction(tr("Save to JSON file"),m_view);
+  m_actionSaveHtml = new QAction(tr("Save to HTML file"),m_view);
   m_actionEnableSort->setData("sortenable");
   m_actionDisableSort->setData("sortdisable");
   m_actionLoad->setData("load");
   m_actionSave->setData("save");
+  m_actionSaveHtml->setData("savehtml");
   connect (m_actionLoad,SIGNAL(triggered()),this,SLOT(onActionLoad()));
   connect (m_actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
+  connect (m_actionSaveHtml,SIGNAL(triggered()),this,SLOT(onActionSaveHtml()));
   connect (m_actionEnableSort,SIGNAL(triggered()),this,SLOT(onActionEnableSort()));
   connect (m_actionDisableSort,SIGNAL(triggered()),this,SLOT(onActionDisableSort()));
   m_actionLoad->setVisible(false);
   m_actionDisableSort->setVisible(false);
-  m_view->header()->addActions(QList<QAction*>() << m_actionEnableSort << m_actionDisableSort << m_actionLoad << m_actionSave);
+  m_view->header()->addActions(QList<QAction*>() << m_actionEnableSort << m_actionDisableSort << m_actionLoad << m_actionSave << m_actionSaveHtml);
   m_view->header()->setContextMenuPolicy(Qt::ActionsContextMenu);
 
   // for mouseclicks
@@ -190,6 +193,7 @@ void QJsonTreeWidget::clear()
 
 void QJsonTreeWidget::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
+  Q_UNUSED(bottomRight);
   // since we emit onDataChanged with (index,index), topLeft is enough
   m_view->update(topLeft);
 }
@@ -371,6 +375,15 @@ void QJsonTreeWidget::onActionSave()
   }
 }
 
+void QJsonTreeWidget::onActionSaveHtml()
+{
+  QString fname = QFileDialog::getSaveFileName(this, tr("Save HTML"),QString(),tr("HTML Files (*.html)"));
+  if (!fname.isEmpty())
+  {
+    toHtmlFile(fname);
+  }
+}
+
 void QJsonTreeWidget::onActionEnableSort()
 {
   setSortingEnabled(true);
@@ -436,3 +449,148 @@ bool QJsonTreeWidget::findTag(const QString& tag, const QJsonTreeItem* item, QJs
   }
   return false;
 }
+
+void QJsonTreeWidget::toHtmlEnd(QXmlStreamWriter* str, const QHash<QString, QString> div) const
+{
+  // close html
+  str->writeEndElement(); // table
+  if (!div.isEmpty())
+  {
+    str->writeEndElement(); // div
+  }
+  str->writeEndElement(); // body
+  str->writeEndElement(); // html
+  delete str;
+}
+
+QXmlStreamWriter* QJsonTreeWidget::toHtmlStart(QString *dest, const QString &title, const QHash<QString, QString> div, const QJsonTreeItem *item) const
+{
+  QXmlStreamWriter* str;
+  str = new QXmlStreamWriter(dest);
+  str->setAutoFormatting(true);
+
+  if (item == 0)
+  {
+    item = m_root;
+  }
+
+  // html header
+  str->writeStartElement("html");
+  str->writeStartElement("head");
+  if (!title.isEmpty())
+  {
+    str->writeTextElement("title",title);
+  }
+  str->writeEndElement(); // head
+
+  // body
+  str->writeStartElement("body");
+  if (!div.isEmpty())
+  {
+    // div
+    str->writeStartElement("div");
+    foreach (QString k, div.keys())
+    {
+      str->writeAttribute(k,div[k]);
+    }
+  }
+
+  // table
+  str->writeStartElement("table");
+  str->writeAttribute("border","1");
+  str->writeStartElement("tr");
+  for (int i=0; i < item->columnCount(); i++)
+  {
+    // headers
+    str->writeTextElement("th",item->headerNameByIdx(i));
+  }
+  str->writeEndElement(); // tr
+
+  return str;
+}
+
+void QJsonTreeWidget::toHtmlInternal(QXmlStreamWriter* str, const QJsonTreeItem* item) const
+{
+  if (item == 0)
+  {
+    item = m_root;
+  }
+
+  // depth spaces
+  int depth = item->depth();
+  QString spaces;
+  for (int i=1; i < depth; i++)
+  {
+    spaces.append(" ");
+  }
+
+  str->writeStartElement("tr");
+  for (int i=0; i < item->columnCount(); i++)
+  {
+    QString s = item->map().value(item->headerTagByIdx(i),QString()).toString();
+    if (s.isEmpty())
+      continue;
+
+    str->writeStartElement("td");
+    if (item->hasChildren())
+    {
+      str->writeStartElement("b"); // parent bold
+    }
+
+    if (i == 0)
+    {
+      // column 0 has spacing
+      if (!spaces.isEmpty())
+      {
+        str->writeStartElement("pre");
+        str->writeCharacters(spaces);
+      }
+    }
+    str->writeCharacters(s);
+    if (!spaces.isEmpty() && i == 0)
+    {
+      str->writeEndElement(); // pre
+    }
+    if (item->hasChildren())
+    {
+      str->writeEndElement(); // b
+    }
+    str->writeEndElement(); // td
+
+  }
+  str->writeEndElement(); // tr
+
+  // recurse
+  for (int i=0; i < item->childCount(); i++)
+  {
+    QJsonTreeItem* it = item->child(i);
+    toHtmlInternal(str,it);
+  }
+}
+
+bool QJsonTreeWidget::toHtmlFile(const QString &path, const QString &title, const QHash<QString,QString> div, const QJsonTreeItem *item) const
+{
+  QFile f (path);
+  if (!f.open(QIODevice::WriteOnly))
+    return false;
+
+  QString s = toHtml(title,div,item);
+  if (s.isEmpty())
+  {
+    f.close();
+    return false;
+  }
+  f.write(s.toLatin1());
+  f.close();
+  return true;
+}
+
+QString QJsonTreeWidget::toHtml(const QString &title, const QHash<QString,QString> div, const QJsonTreeItem *item) const
+{
+  QString s;
+  QXmlStreamWriter* str = toHtmlStart(&s,title,div,item);
+  toHtmlInternal(str,item);
+  toHtmlEnd(str,div);
+  return s;
+}
+

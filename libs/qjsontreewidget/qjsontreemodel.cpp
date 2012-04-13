@@ -120,6 +120,7 @@ QModelIndex QJsonTreeModel::parent(const QModelIndex &index) const
 
 int QJsonTreeModel::columnCount(const QModelIndex &parent) const
 {
+  Q_UNUSED(parent);
   if (m_root)
   {
     // return root item's column count (from the _columns_ descriptor)
@@ -275,6 +276,7 @@ Qt::ItemFlags QJsonTreeModel::flags(const QModelIndex &index) const
 
 QVariant QJsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+  Q_UNUSED(orientation);
   if (!m_root)
     return QVariant();
 

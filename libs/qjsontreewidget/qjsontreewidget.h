@@ -25,6 +25,7 @@
 #include <QJson/Serializer>
 #include <QJson/Parser>
 #include <QJson/QObjectHelper>
+#include <QXmlStreamWriter>
 #include "qjsontree_global.h"
 #include "qjsontreemodel.h"
 #include "qjsontreeitemdelegate.h"
@@ -445,7 +446,7 @@
    /**
     * @brief the background color for the parent items
     *
-    * @returns QColor
+    * @return QColor
     */
    QColor parentsBackgroundColor () const { return m_model->parentsBackgroundColor(); }
 
@@ -459,7 +460,7 @@
    /**
     * @brief the foreground color for the parent items
     *
-    * @returns QColor
+    * @return QColor
     */
    QColor parentsForegroundColor () const { return m_model->parentsForegroundColor(); }
 
@@ -473,7 +474,7 @@
    /**
     * @brief the font for the parent items
     *
-    * @returns QFont
+    * @return QFont
     */
    QFont parentsFont () const { return m_model->parentsFont(); }
 
@@ -487,7 +488,7 @@
    /**
     * @brief the background color for the child items
     *
-    * @returns QColor
+    * @return QColor
     */
    QColor childsBackgroundColor () const { return m_model->childsBackgroundColor(); }
 
@@ -501,7 +502,7 @@
    /**
     * @brief the foreground color for the parent items
     *
-    * @returns QColor
+    * @return QColor
     */
    QColor childsForegroundColor () const { return m_model->childsForegroundColor(); }
 
@@ -515,9 +516,29 @@
    /**
     * @brief the font for child items
     *
-    * @returns QFont
+    * @return QFont
     */
    QFont childsFont () const { return m_model->childsFont(); }
+
+   /**
+    * @brief outputs the tree to html string
+    *
+    * @param title optional, the page title
+    * @param div hash with optional "div" names and values
+    * @param item 0 for the whole tree, or a specific item
+    */
+   QString toHtml(const QString &title=QString(), const QHash<QString, QString> div =QHash<QString,QString>(), const QJsonTreeItem *item=0) const;
+
+   /**
+    * @brief outputs the tree to html file
+    *
+    * @param path path to the destination html file
+    * @param title optional, the page title
+    * @param div hash with optional "div" names and values
+    * @param item 0 for the whole tree, or a specific item
+    * @return bool
+    */
+   bool toHtmlFile(const QString& path, const QString& title = QString(), const QHash<QString,QString> div = QHash<QString,QString>(), const QJsonTreeItem* item = 0) const;
 
  signals:
    /**
@@ -546,6 +567,7 @@
    void onActionSave();
    void onActionEnableSort();
    void onActionDisableSort();
+   void onActionSaveHtml();
 
  protected:
    QJsonSortFilterProxyModel* proxyModel() const { return m_proxyModel; }
@@ -557,6 +579,9 @@
    void searchInternal();
    bool loadJsonInternal(const QVariantMap &map);
    void setNotFoundInvalidOrEmptyError(const QString &function, const QString &val);
+   QXmlStreamWriter *toHtmlStart(QString *dest, const QString &title=QString(), const QHash<QString, QString> div = QHash<QString,QString>(), const QJsonTreeItem *item=0) const;
+   void toHtmlEnd(QXmlStreamWriter* str, const QHash<QString, QString> div = QHash<QString,QString>()) const;
+   void toHtmlInternal(QXmlStreamWriter *str, const QJsonTreeItem *item = 0) const;
 
    QTreeView* m_view;
    QGridLayout* m_optLayout;
@@ -570,6 +595,7 @@
    QModelIndex m_currentSelection;
    QAction* m_actionLoad;
    QAction* m_actionSave;
+   QAction* m_actionSaveHtml;
    QAction* m_actionEnableSort;
    QAction* m_actionDisableSort;
    QHash<QString,bool> m_purgeList;
