@@ -463,16 +463,11 @@ void QJsonTreeWidget::toHtmlEnd(QXmlStreamWriter* str, const QHash<QString, QStr
   delete str;
 }
 
-QXmlStreamWriter* QJsonTreeWidget::toHtmlStart(QString *dest, const QString &title, const QHash<QString, QString> div, const QJsonTreeItem *item) const
+QXmlStreamWriter* QJsonTreeWidget::toHtmlStart(QString *dest, const QString &title, const QHash<QString, QString> div, const QModelIndex& index) const
 {
   QXmlStreamWriter* str;
   str = new QXmlStreamWriter(dest);
   str->setAutoFormatting(true);
-
-  if (item == 0)
-  {
-    item = m_root;
-  }
 
   // html header
   str->writeStartElement("html");
@@ -499,6 +494,7 @@ QXmlStreamWriter* QJsonTreeWidget::toHtmlStart(QString *dest, const QString &tit
   str->writeStartElement("table");
   str->writeAttribute("border","1");
   str->writeStartElement("tr");
+  QJsonTreeItem* item = m_model->itemByModelIndex(QJsonSortFilterProxyModel::indexToSourceIndex(index));
   for (int i=0; i < item->columnCount(); i++)
   {
     // headers
@@ -509,12 +505,9 @@ QXmlStreamWriter* QJsonTreeWidget::toHtmlStart(QString *dest, const QString &tit
   return str;
 }
 
-void QJsonTreeWidget::toHtmlInternal(QXmlStreamWriter* str, const QJsonTreeItem* item) const
+void QJsonTreeWidget::toHtmlInternal(QXmlStreamWriter *str, const QModelIndex &index) const
 {
-  if (item == 0)
-  {
-    item = m_root;
-  }
+  QJsonTreeItem* item = m_model->itemByModelIndex(QJsonSortFilterProxyModel::indexToSourceIndex(index));
 
   // depth spaces
   int depth = item->depth();
@@ -559,14 +552,18 @@ void QJsonTreeWidget::toHtmlInternal(QXmlStreamWriter* str, const QJsonTreeItem*
   str->writeEndElement(); // tr
 
   // recurse
-  for (int i=0; i < item->childCount(); i++)
+  int i = 0;
+  while (true)
   {
-    QJsonTreeItem* it = item->child(i);
-    toHtmlInternal(str,it);
+    QModelIndex idx = index.child(i,0);
+    if (!idx.isValid())
+      break;
+    toHtmlInternal(str,idx);
+    i++;
   }
 }
 
-bool QJsonTreeWidget::toHtmlFile(const QString &path, const QString &title, const QHash<QString,QString> div, const QJsonTreeItem *item) const
+bool QJsonTreeWidget::toHtmlFile(const QString &path, const QString &title, const QHash<QString,QString> div, QJsonTreeItem *item) const
 {
   QFile f (path);
   if (!f.open(QIODevice::WriteOnly))
@@ -595,12 +592,25 @@ void QJsonTreeWidget::setHeaderMenuEnabled(bool enable)
   }
 }
 
-QString QJsonTreeWidget::toHtml(const QString &title, const QHash<QString,QString> div, const QJsonTreeItem *item) const
+QString QJsonTreeWidget::toHtml(const QString &title, const QHash<QString,QString> div, QJsonTreeItem *item) const
 {
+  QModelIndex idx;
+
+  if (!item)
+  {
+    // get the view's root
+    idx = m_proxyModel->index(0,0,QModelIndex());
+  }
+  else
+  {
+    // specific item
+    idx = QJsonSortFilterProxyModel::indexToProxyIndex(m_model->indexByItem(item,0));
+  }
+
   QString s;
-  QXmlStreamWriter* str = toHtmlStart(&s,title,div,item);
-  toHtmlInternal(str,item);
+  QXmlStreamWriter* str = toHtmlStart(&s,title,div,idx);
+  toHtmlInternal(str,idx);
+
   toHtmlEnd(str,div);
   return s;
 }
-

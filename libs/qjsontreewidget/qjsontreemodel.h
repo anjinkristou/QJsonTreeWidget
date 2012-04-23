@@ -233,7 +233,6 @@ protected:
   QJsonTreeItem::SpecialFlags specialFlags() const { return m_specialFlags; }
 
 private:
-
   void setColumnBackgroundColor (const QString& tag, const QColor& color) { m_columnBackColors[tag] = color; }
   QColor columnBackgroundColor (const QString& tag) const { return m_columnBackColors.value(tag,QColor()); }
   void setColumnForegroundColor (const QString& tag, const QColor& color) { m_columnForeColors[tag] = color; }

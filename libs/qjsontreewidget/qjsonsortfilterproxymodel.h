@@ -57,7 +57,7 @@ public:
   /**
    * @brief helper function to map an index to the source model index (calls mapToSource() on the index model)
    *
-   * @param index must be a proxy model index
+   * @param index must be a valid proxy model index
    * @return QModelIndex
    */
   static QModelIndex indexToSourceIndex (const QModelIndex& index);
@@ -65,7 +65,7 @@ public:
   /**
    * @brief helper function to map an index to the proxy model index (calls mapToSource() on the index model)
    *
-   * @param index must be a source model index
+   * @param index must be a valid source model index
    * @return QModelIndex
    */
   static QModelIndex indexToProxyIndex (const QModelIndex& index);
@@ -73,10 +73,11 @@ public:
   /**
    * @brief helper function to retrieve the index source model
    *
-   * @param index must be a proxy model index
+   * @param index must be a valid proxy model index
    * @return const QJsonTreeModel*
    */
   static const QJsonTreeModel* indexSourceModel (const QModelIndex& index);
+
 };
 
 #endif // QJSONSORTFILTERPROXYMODEL_H

@@ -527,7 +527,7 @@
     * @param div hash with optional "div" names and values
     * @param item 0 for the whole tree, or a specific item
     */
-   QString toHtml(const QString &title=QString(), const QHash<QString, QString> div =QHash<QString,QString>(), const QJsonTreeItem *item=0) const;
+   QString toHtml(const QString &title=QString(), const QHash<QString, QString> div =QHash<QString,QString>(), QJsonTreeItem *item=0) const;
 
    /**
     * @brief outputs the tree to html file
@@ -538,7 +538,7 @@
     * @param item 0 for the whole tree, or a specific item
     * @return bool
     */
-   bool toHtmlFile(const QString& path, const QString& title = QString(), const QHash<QString,QString> div = QHash<QString,QString>(), const QJsonTreeItem* item = 0) const;
+   bool toHtmlFile(const QString& path, const QString& title = QString(), const QHash<QString,QString> div = QHash<QString,QString>(), QJsonTreeItem* item = 0) const;
 
    /**
     * @brief enables the menu (load/save/sort/savehtml) activated by rightclicking on the header
@@ -586,9 +586,9 @@
    void searchInternal();
    bool loadJsonInternal(const QVariantMap &map);
    void setNotFoundInvalidOrEmptyError(const QString &function, const QString &val);
-   QXmlStreamWriter *toHtmlStart(QString *dest, const QString &title=QString(), const QHash<QString, QString> div = QHash<QString,QString>(), const QJsonTreeItem *item=0) const;
+   QXmlStreamWriter *toHtmlStart(QString *dest, const QString &title, const QHash<QString, QString> div, const QModelIndex &index = QModelIndex()) const;
    void toHtmlEnd(QXmlStreamWriter* str, const QHash<QString, QString> div = QHash<QString,QString>()) const;
-   void toHtmlInternal(QXmlStreamWriter *str, const QJsonTreeItem *item = 0) const;
+   void toHtmlInternal(QXmlStreamWriter *str, const QModelIndex& index = QModelIndex()) const;
 
    QTreeView* m_view;
    QGridLayout* m_optLayout;
